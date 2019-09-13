@@ -13,7 +13,7 @@ class Atom(object):
     '''
     def __init__(self, species=0, coordinates=np.array([0.0, 0.0, 0.0])):
         self.__species = species
-        self.__coordinates = coordinates
+        self.__coordinates = np.array(coordinates)
 
     @property
     def species(self):
@@ -21,8 +21,10 @@ class Atom(object):
 
     @species.setter
     def species(self, value):
-        if not isinstance(value,Number):
+        if not isinstance(value,int):
             raise TypeError("Atomic species should be defined by their atomic number.")
+        if ((value < 1) or (value > 118)):
+            raise Exception("Atomic number must be a integer number between 1 and 118.")
         self.__species = value
 
     @property
@@ -31,9 +33,11 @@ class Atom(object):
 
     @coordinates.setter
     def coordinates(self, values):
-        if not isinstance(values,np.ndarray):
-            raise TypeError("Coordinates should be of type numpy.ndarray.")
-        self.__coordinates = values
+        if not (isinstance(values,list) or isinstance(values,np.ndarray)):
+            raise TypeError("Coordinates should by type list or numpy array (np.ndarray).")
+        if len(values) != 3:
+            raise Exception("Coordinates must be 3 values in a list or numpy array.")
+        self.__coordinates = np.array(values)
 
 
 

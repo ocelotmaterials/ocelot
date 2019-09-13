@@ -10,7 +10,7 @@ import pandas as pd
 #import matplotlib.pyplot as plt
 #import seaborn as sns
 
-import ocelot.heart       # core classes and functions
+from ocelot.heart import *   # core classes and functions
 
 # import ocelot.brain     # basic algorithms
 # import ocelot.eyes      # data analysis and visualization tools

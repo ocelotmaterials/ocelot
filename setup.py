@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# GLACIES (Aqua-solids)
+# ocelot
 
 import setuptools
 import inspect
@@ -8,7 +8,8 @@ import sys
 import os
 
 long_description = """
-Glacies is a extensible, modular, open-source library for quantum simulation of solids based on planewave basis.
+ocelot is a extensible, modular, open-source library for quantum simulation
+of solids with periodic boundary conditions (Bloch waves).
 """
 
 requirements = [

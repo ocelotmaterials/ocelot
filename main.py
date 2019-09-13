@@ -13,7 +13,7 @@ import pandas as pd
 import ocelot.heart       # core classes and functions
 
 # import ocelot.brain     # basic algorithms
-# import ocelot.eye       # data analysis and visualization tools
+# import ocelot.eyes      # data analysis and visualization tools
 # import ocelot.claws     # interface with qiskit (for IBMQ), cirq (for Google Quantum AI), and pyquil (for Rigetti Computing)
 # import ocelot.tusks     # optimization algorithms
 

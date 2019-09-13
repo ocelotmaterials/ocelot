@@ -13,5 +13,12 @@ of solids with periodic boundary conditions (Bloch waves).
 """
 
 requirements = [
+# numpy
+# pandas
+# matplotlib
+# seaborn
+# behave
+# qiskit
+# cirq
 
 ]

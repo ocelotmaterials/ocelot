@@ -5,6 +5,8 @@
   Module heart 
 '''
 
+import numpy as np
+
 class Atom(object):
     '''
     Atom class, defined by chemical species (atomic number), and coordinates (numpy array).
@@ -36,7 +38,7 @@ class Atom(object):
 
 
 class Material(Atom):
-    def __init__(self, atoms, lattice_constant = 1.0, bravais_lattice):
+    def __init__(self, atoms, lattice_constant = 1.0, bravais_lattice = np.eye(3)):
         self.__atoms = atoms
         self.__lattice_constant = lattice_constant
         self.__bravais_lattice = bravais_lattice

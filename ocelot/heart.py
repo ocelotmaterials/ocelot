@@ -135,6 +135,10 @@ class Material(Atom):
     #def supercell(self,matrix):
         # to do
 
+    #def reciprocal_lattice(self):
+        # to do
+        # reciprocal_lattice = 2π*inv(bravais_lattice)'
+
 class KGrid(Material):
     '''
     k points sample in Brillouin Zone for a Material object.
@@ -144,8 +148,7 @@ class KGrid(Material):
         self.__matrix = matrix
         self.__shift = shift
 
-    #def reciprocal_lattice(self):
-        # to do
+
 
 class Planewave(KGrid):
     def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):

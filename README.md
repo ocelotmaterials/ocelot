@@ -1,9 +1,12 @@
-![Image](ocelot_logo.png){:height="400px" width="400px"}
+![Image](./ocelot_logo.png)
 
 ## Ocelot
 Ocelot is an open-source framework for quantum simulation of solids in quantum computer.
 
 ## Installation
+
+
+## Getting started
 
 
 ## License

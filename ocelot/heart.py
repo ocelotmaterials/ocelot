@@ -28,6 +28,8 @@ class Atom(object):
         Atom class, defined by chemical species (atomic number), and coordinates (numpy array).
     '''
     def __init__(self, species=0, coordinates=np.array([0.0, 0.0, 0.0])):
+        if ((species < 1) or (species > 118)):
+            raise Exception("species should be defined by an atomic number between 1 and 118.")
         self.__species = species
         self.__coordinates = np.array(coordinates)
 
@@ -64,7 +66,6 @@ class Material(Atom):
         self.__atoms = atoms
         self.__lattice_constant = lattice_constant
         self.__bravais_vector = bravais_vector
-        self.__bravais_lattice = np.array(self.__bravais_vector) * self.__lattice_constant
         self.__crystallographic = crystallographic
 
     @property
@@ -87,7 +88,7 @@ class Material(Atom):
 
     @property
     def bravais_lattice(self):
-        return self.__bravais_lattice
+        return np.array(self.__bravais_vector) * self.__lattice_constant
 
 
     def to_xyz(self):
@@ -139,7 +140,7 @@ class KGrid(Material):
         # to do
 
 class Planewave(KGrid):
-    def __init__(self, energy_cutoff = 20, energy_unit = "Ha")
+    def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
         self.__energy_cutoff = energy_cutoff
         self.__energy_unit = energy_unit
 
@@ -159,6 +160,6 @@ if __name__ == '__main__':
     # print(atom.species)
     # print(atom.coordinates)
     material = Material([atom1, atom2], lattice_constant = 2.47, bravais_vector=[[np.sqrt(3)/2, -1/2, 0.0], [np.sqrt(3)/2, 1/2, 0.0], [0.0, 0.0, 20.0/2.47]])
-    #print(material.bravais_lattice)
+    print(material.bravais_lattice)
     #material.to_xyz()
     material.to_poscar()

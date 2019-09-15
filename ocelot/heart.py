@@ -115,6 +115,27 @@ class Material(Atom):
             for atom in self.atoms:
                 print("{}  {:.6f}  {:.6f}  {:.6f}".format(chem[atom.species], atom.coordinates[0], atom.coordinates[1], atom.coordinates[2]))
 
+    def to_dataframe(self):
+        '''
+        Convert a list of atoms in a Material object to a pandas DataFrame.
+        '''
+        import pandas as pd
+        species = []
+        for atom in self.atoms:
+            species.append(atom.species)
+
+        coordinates = []
+        for atom in self.atoms:
+            coordinates.append(atom.coordinates)
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['Coordinates'] = coordinates
+        df.sort_values('Species', inplace=True)
+        df = df.reset_index().drop(['index'], axis = 1)
+        return df
+
+
     def to_poscar(self, cartesian=False):
         '''
         Convert an Material object to a POSCAR file.
@@ -126,11 +147,22 @@ class Material(Atom):
             print("    {:.12f}  {:.12f}  {:.12f}".format(self.bravais_vector[0][0], self.bravais_vector[0][1], self.bravais_vector[0][2]))
             print("    {:.12f}  {:.12f}  {:.12f}".format(self.bravais_vector[1][0], self.bravais_vector[1][1], self.bravais_vector[1][2]))
             print("    {:.12f}  {:.12f}  {:.12f}".format(self.bravais_vector[2][0], self.bravais_vector[2][1], self.bravais_vector[2][2]))
-            #unique_atoms = Counter(self.atoms)
-            #for atom in self.atoms:
-                #print(counter, end=" ")
+        
+        species = []
+        for atom in self.atoms:
+            species.append(atom.species)
 
-            #print("\n")
+        unique_atoms = Counter(species)
+        print("   ", end=" ")
+        for unique_atom in unique_atoms:
+            print(chem[unique_atom], end=" ")
+
+        print("\n   ", end=" ")
+        for unique_atom in unique_atoms:
+            print(unique_atoms[unique_atom], end="  ")
+  
+        print("\nDirect")
+
 
     #def supercell(self,matrix):
         # to do
@@ -166,14 +198,17 @@ chem = [' ', 'H ', 'He', 'Li', 'Be', 'B ', 'C ', 'N ', 'O ', 'F ', 'Ne', 'Na', '
 
 
 if __name__ == '__main__':
-    atom1 = Atom(6, [0.0,0.0,0.0])
-    atom2 = Atom(6, [1/3, 1/3, 0.0])
+    atom1 = Atom(6, [0.0,0.0,0.5])
+    atom2 = Atom(6, [1/3, 1/3, 0.5])
+    atom3 = Atom(1, [0, 0, 0.55])
+    atom4 = Atom(1, [1/3, 1/3, 0.45])
     # print(atom.species)
     # print(atom.coordinates)
-    material = Material([atom1, atom2], lattice_constant = 2.467,
+    material = Material([atom1, atom3, atom2, atom4], lattice_constant = 2.467,
                                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                                           [np.sqrt(3)/2, 1/2, 0.0],
                                                           [0.0, 0.0, 20.0/2.467]])
 #    print(material.bravais_lattice)
 #    material.to_xyz()
-    material.to_poscar()
+    #material.to_poscar()
+    print(material.to_dataframe())

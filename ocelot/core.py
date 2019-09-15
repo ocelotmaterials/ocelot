@@ -17,8 +17,8 @@
 #   limitations under the License.
 
 '''
-  Module heart 
-    filename: heart.py
+  Module core 
+    filename: core.py
 '''
 
 import numpy as np

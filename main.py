@@ -18,18 +18,17 @@
 #   limitations under the License.
   
 '''
-    ocelot - A quantum program to simulate solids in a quantum computer.
+    ocelot
 '''
 
-import numpy as np
-import pandas as pd
-#import matplotlib.pyplot as plt
-#import seaborn as sns
+import sys
+import os
+#import numpy as np
+#import pandas as pd
 
-from ocelot.heart import *   # core classes and functions
+from ocelot.core import *   # core classes and functions
 
-# from ocelot.brain import *    # basic algorithms
-# from ocelot.eyes  import *    # data analysis and visualization tools
-# from ocelot.claws import *    # interface with qiskit, cirq, and pyquil
-# from ocelot.tusks import *    # optimization algorithms
-
+# from ocelot.kernel import *
+# from ocelot.algorithms import *        # basic algorithms
+# from ocelot.visualizations import *    # data analysis and visualization tools
+# from ocelot.devices import *           # interface with qiskit, cirq, and pyquil

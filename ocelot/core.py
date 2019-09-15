@@ -22,6 +22,8 @@
 '''
 
 import numpy as np
+import pandas as pd
+from collections import Counter    # importing Counter
 
 class Atom(object):
     '''
@@ -102,7 +104,6 @@ class Material(Atom):
         '''
         Convert a list of atoms in a Material object to a pandas DataFrame.
         '''
-        import pandas as pd    # importing pandas
         species = []
         for atom in self.atoms:
             species.append(atom.species)
@@ -123,6 +124,10 @@ class Material(Atom):
         df.sort_values('Species', inplace=True)
         df = df.reset_index().drop(['index'], axis = 1)
         return df
+
+    #def read_csv(self,filename):
+    #    import sys
+    #    df = pd.read_csv(sys.argv[1])
 
     def write_xyz(self):
         '''
@@ -152,7 +157,6 @@ class Material(Atom):
         print("    {:.12f}  {:.12f}  {:.12f}".format(self.bravais_vector[2][0], self.bravais_vector[2][1], self.bravais_vector[2][2]))
         
         species = self.to_dataframe()['Species']
-        from collections import Counter    # importing Counter
         unique_atoms = Counter(species)
         print("   ", end=" ")
         for unique_atom in unique_atoms:
@@ -170,10 +174,9 @@ class Material(Atom):
             # to do
 
     def reciprocal_lattice(self):
-        import numpy as np    # importing numpy
         return 2 * np.pi * np.linalg.inv(self.bravais_lattice).transpose()
     
-    #def supercell(self,matrix):
+    #def supercell_lattice(self,matrix):
         # to do
 
 class KGrid(Material):
@@ -216,9 +219,7 @@ if __name__ == '__main__':
                                           [np.sqrt(3)/2, 1/2, 0.0],
                                           [0.0, 0.0, 20.0/2.467]])
     #print(material.bravais_lattice)
-    #material.write_xyz()
+    material.write_xyz()
     #material.write_poscar()
-    import numpy as np
-    #test = np.dot(material.bravais_lattice, material.reciprocal_lattice().transpose())
-    #print(material.bravais_lattice)
+    #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
     #print(material.reciprocal_lattice())

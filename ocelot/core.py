@@ -145,6 +145,26 @@ class Material(Atom):
             for atom in self.atoms:
                 print("{}  {:.6f}  {:.6f}  {:.6f}".format(chem[atom.species], atom.coordinates[0], atom.coordinates[1], atom.coordinates[2]))
 
+    def write_ordered_xyz(self):
+        if self.crystallographic:
+            df = self.to_dataframe()
+            print(df.shape[0])
+            print("  ")
+            
+            label = []
+            for atom in list(df['Species']):
+                label.append(chem[atom])
+
+            atom_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
+            df['label'] = label
+            df['x_cart'] = atom_xyz[:,0]
+            df['y_cart'] = atom_xyz[:,1]
+            df['z_cart'] = atom_xyz[:,2]
+            df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
+            for index, row in df.iterrows():
+                print("{}  {:.8f}  {:.8f}  {:.8}".format(row[0], row[1], row[2], row[3]))
+        #else:
+
 
     def write_poscar(self):
         '''
@@ -219,7 +239,8 @@ if __name__ == '__main__':
                                           [np.sqrt(3)/2, 1/2, 0.0],
                                           [0.0, 0.0, 20.0/2.467]])
     #print(material.bravais_lattice)
-    material.write_xyz()
+    #material.write_xyz()
+    material.write_ordered_xyz()
     #material.write_poscar()
     #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
     #print(material.reciprocal_lattice())

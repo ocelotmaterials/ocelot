@@ -5,6 +5,7 @@ Ocelot is an open-source framework for quantum simulation of solids in quantum c
 
 ## Installation
 
+pip install ocelot-quantum
 
 ## Getting started
 

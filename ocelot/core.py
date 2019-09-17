@@ -125,9 +125,9 @@ class Material(Atom):
         df = df.reset_index().drop(['index'], axis = 1)
         return df
 
-    #def read_csv(self,filename):
+    #def read_yaml(self,filename):
     #    import sys
-    #    df = pd.read_csv(sys.argv[1])
+    #    df = pd.read_yaml(sys.argv[1])
 
     def write_xyz(self):
         '''
@@ -196,8 +196,9 @@ class Material(Atom):
     def reciprocal_lattice(self):
         return 2 * np.pi * np.linalg.inv(self.bravais_lattice).transpose()
     
-    #def supercell_lattice(self,matrix):
-        # to do
+    def supercell_lattice(self,matrix=np.eye(3)):
+        self.__matrix = np.array(matrix)
+        return self.bravais_lattice * self.__matrix
 
 class KGrid(Material):
     '''
@@ -230,17 +231,18 @@ if __name__ == '__main__':
     atom2 = Atom(6, [1/3, 1/3, 0.5])
     atom3 = Atom(1, [0, 0, 0.55])
     atom4 = Atom(1, [1/3, 1/3, 0.45])
-    atom5 = Atom(79, [2/3, 2/3, 0.7])
+    #atom5 = Atom(79, [2/3, 2/3, 0.7])
     # print(atom.species)
     # print(atom.coordinates)
-    material = Material([atom5, atom1, atom3, atom2, atom4],
+    material = Material([atom1, atom3, atom2, atom4],
                         lattice_constant = 2.467,
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2, 1/2, 0.0],
                                           [0.0, 0.0, 20.0/2.467]])
     #print(material.bravais_lattice)
     #material.write_xyz()
-    material.write_ordered_xyz()
-    #material.write_poscar()
+    #material.write_ordered_xyz()
+    material.write_poscar()
+    #print(material.supercell_lattice(2*np.eye(3)))
     #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
     #print(material.reciprocal_lattice())

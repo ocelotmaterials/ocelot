@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# file: core.py
 
 # This code is part of Ocelot.
 #
@@ -18,7 +19,6 @@
 
 '''
   Module core 
-    filename: core.py
 '''
 
 import numpy as np

@@ -22,6 +22,9 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as handle:
     long_description = handle.read()
 
+# Read in requirements.txt
+requirements = open('requirements.txt').readlines()
+requirements = [r.strip() for r in requirements]
 
 setup(
     name = "ocelot-quantum",
@@ -33,13 +36,7 @@ setup(
     description = "Ocelot is a framework for quantum simulation of materials in quantum computers.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires = ['numpy >= 1.16.4',
-                        'pandas >= 0.24.2',
-                        'matplotlib >= 2.2.4',
-                        'seaborn >= 0.9.0', 
-                        'behave >= 1.2.6',
-                        'qiskit >= 0.11.0',
-                        'cirq >= 0.6.0'],
+    install_requires = requirements,
     license = 'Apache 2',
     classifiers = [
          "Development Status :: 1 - Planning"

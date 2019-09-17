@@ -129,7 +129,7 @@ class Material(Atom):
     #    import sys
     #    df = pd.read_yaml(sys.argv[1])
 
-    def write_xyz(self):
+    def write_simple_xyz(self): # deprecated method
         '''
         Convert an Material object to a xyz file.
         '''
@@ -145,25 +145,32 @@ class Material(Atom):
             for atom in self.atoms:
                 print("{}  {:.6f}  {:.6f}  {:.6f}".format(chem[atom.species], atom.coordinates[0], atom.coordinates[1], atom.coordinates[2]))
 
-    def write_ordered_xyz(self):
-        if self.crystallographic:
-            df = self.to_dataframe()
-            print(df.shape[0])
-            print("  ")
+    def write_xyz(self):
+        
+        df = self.to_dataframe()
+        print(df.shape[0])
+        print("  ")
             
-            label = []
-            for atom in list(df['Species']):
-                label.append(chem[atom])
+        label = []
+        for atom in list(df['Species']):
+            label.append(chem[atom])
+        
+        df['label'] = label
 
-            atom_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
-            df['label'] = label
-            df['x_cart'] = atom_xyz[:,0]
-            df['y_cart'] = atom_xyz[:,1]
-            df['z_cart'] = atom_xyz[:,2]
+        if self.crystallographic:
+            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
+            
+            df['x_cart'] = atoms_xyz[:,0]
+            df['y_cart'] = atoms_xyz[:,1]
+            df['z_cart'] = atoms_xyz[:,2]
             df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
             for index, row in df.iterrows():
                 print("{}  {:.8f}  {:.8f}  {:.8}".format(row[0], row[1], row[2], row[3]))
-        #else:
+        else:
+            atoms_xyz = np.array(df[['x', 'y', 'z']])
+            df = df[['label', 'x', 'y', 'z']]
+            for index, row in df.iterrows():
+                print("{}  {:.8f}  {:.8f}  {:.8}".format(row[0], row[1], row[2], row[3]))
 
 
     def write_poscar(self):
@@ -210,7 +217,6 @@ class KGrid(Material):
         self.__shift = shift
 
 
-
 class Planewave(KGrid):
     def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
         self.__energy_cutoff = energy_cutoff
@@ -231,6 +237,8 @@ if __name__ == '__main__':
     atom2 = Atom(6, [1/3, 1/3, 0.5])
     atom3 = Atom(1, [0, 0, 0.55])
     atom4 = Atom(1, [1/3, 1/3, 0.45])
+    atom_x1 = Atom(6, [0.0, 0.0, 0.0])
+    atom_x2 = Atom(6, [0.0, 1.47, 0.0])
     #atom5 = Atom(79, [2/3, 2/3, 0.7])
     # print(atom.species)
     # print(atom.coordinates)
@@ -239,10 +247,18 @@ if __name__ == '__main__':
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2, 1/2, 0.0],
                                           [0.0, 0.0, 20.0/2.467]])
+
+    material2 = Material([atom_x1, atom_x2],
+                        lattice_constant = 2.47,
+                        bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
+                                          [np.sqrt(3)/2, 1/2, 0.0],
+                                          [0.0, 0.0, 20.0/2.467]],
+                        crystallographic=False)
+
     #print(material.bravais_lattice)
     #material.write_xyz()
-    #material.write_ordered_xyz()
-    material.write_poscar()
+    #material.write_xyz()
+    material2.write_xyz()
     #print(material.supercell_lattice(2*np.eye(3)))
     #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
     #print(material.reciprocal_lattice())

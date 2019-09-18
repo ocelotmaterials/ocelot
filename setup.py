@@ -39,12 +39,12 @@ setup(
     install_requires = requirements,
     license = 'Apache 2',
     classifiers = [
-         "Development Status :: 1 - Planning"
+         "Development Status :: 1 - Planning",
          "Programming Language :: Python :: 3",
          "Topic :: Scientific/Engineering :: Chemistry",
          "Topic :: Scientific/Engineering :: Physics",
          "License :: OSI Approved :: Apache Software License",
          "Operating System :: OS Independent"
-    ]
+    ],
     python_requires = '>= 3.7.*'
 )

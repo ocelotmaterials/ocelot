@@ -35,7 +35,6 @@ setup(
     url="https://ocelot-quantum.org",
     description = "Ocelot is a framework for quantum simulation of materials in quantum computers.",
     long_description=long_description,
-    long_description_content_type="text/markdown",
     install_requires = requirements,
     license = 'Apache 2',
     classifiers = [

@@ -26,7 +26,7 @@
 #import numpy as np
 #import pandas as pd
 
-from ocelot.core import *   # core classes and functions
+#from ocelot.core import *   # core classes and functions
 
 # from ocelot.kernel import *
 # from ocelot.algorithms import *        # basic algorithms

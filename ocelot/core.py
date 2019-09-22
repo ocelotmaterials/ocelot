@@ -32,8 +32,8 @@ class Atom(object):
         Atom class, defined by chemical species (atomic number), and coordinates (numpy array).
     '''
     def __init__(self, species=0, coordinates=np.array([0.0, 0.0, 0.0])):
-        if ((species < 1) or (species > 118)):
-            raise Exception("species should be defined by an atomic number between 1 and 118.")
+        if ((species < 1) or (species > 118)): 
+            raise Exception("Species should be defined by atomic number between 1 and 118.")
         self.__species = species
         self.__coordinates = np.array(coordinates)
 
@@ -217,8 +217,14 @@ class KGrid(Material):
         self.__supercell = self.bravais_lattice*self.__matrix
 
 
-
 class Planewave(KGrid):
+    '''
+    Planewave class to span pediodic wave functions.
+    A planewave object is defined by a list of reciprocal lattice vectors [G_1, G_2, ...].
+
+        \psi_{nk}(r) = \sum_{G}c_{n}(k+G)exp(i(k+G).r)
+
+    '''
     def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
         self.__energy_cutoff = energy_cutoff
         self.__energy_unit = energy_unit

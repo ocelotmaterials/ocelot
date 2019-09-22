@@ -17,12 +17,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-name = "ocelot-quantum"
-
-__version__ = 0.0.2
-
-#from .core import *
+from .core import *
 #from .algorithms import *
 #from .potentials import *
 #from .molecular import *
 #from .devices import *
+
+__version__ = "0.0.2"

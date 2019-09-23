@@ -19,9 +19,6 @@
 
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as handle:
-    long_description = handle.read()
-
 # Read in requirements.txt
 requirements = open('requirements.txt').readlines()
 requirements = [r.strip() for r in requirements]
@@ -34,7 +31,10 @@ setup(
     author_email = "leandro.seixas@mackenzie.br", 
     url="https://ocelot-quantum.org",
     description = "Ocelot is a framework for quantum simulation of materials in quantum computers.",
-    long_description=long_description,
+    long_description='''
+    Ocelot is a framework for quantum simulation of materials in quantum computers.
+    It is agnostic hardware, and can be used in annealer quantum computers and circuit model quantum computers. 
+    ''',
     install_requires = requirements,
     license = 'Apache 2',
     classifiers = [

@@ -28,7 +28,7 @@ requirements = [r.strip() for r in requirements]
 
 setup(
     name = "ocelot-quantum",
-    version = "0.0.2",
+    version = "0.0.3",
     packages = find_packages(),
     author = "Leandro Seixas",
     author_email = "leandro.seixas@mackenzie.br", 
@@ -45,5 +45,5 @@ setup(
          "License :: OSI Approved :: Apache Software License",
          "Operating System :: OS Independent"
     ],
-    python_requires = '>= 3.6.*'
+    python_requires = '>= 3.7.*'
 )

@@ -206,7 +206,11 @@ class Material(Atom):
         self.__matrix = np.array(matrix)
         return self.bravais_lattice * self.__matrix
 
-class KGrid(Material):
+# class Molecule(object):
+# class ReciprocalLattice(object):
+# class Supercell(object):
+
+class KGrid(object):
     '''
     k points sample in Brillouin Zone for a Material object.
     By default, using Monkhorst-Pack algorithm [Phys. Rev. B 13, 5188 (1976)].
@@ -230,42 +234,13 @@ class Planewave(KGrid):
         self.__energy_unit = energy_unit
 
 
-# Periodic table
-chem = [' ', 'H ', 'He', 'Li', 'Be', 'B ', 'C ', 'N ', 'O ', 'F ', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P ', 'S ', 'Cl', 'Ar', 'K ', 'Ca',
+# Periodic table tuple
+chem = (' ', 'H ', 'He', 'Li', 'Be', 'B ', 'C ', 'N ', 'O ', 'F ', 'Ne', 'Na', 'Mg', 'Al', 'Si', 'P ', 'S ', 'Cl', 'Ar', 'K ', 'Ca',
              'Sc', 'Ti', 'V ', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb', 'Sr', 'Y ', 'Zr',
              'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I ', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd',
              'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta', 'W ', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg',
              'Tl', 'Pb', 'Bi', 'Po', 'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U ', 'Np', 'Pu', 'Am', 'Cm', 'Bk', 'Cf', 'Es', 'Fm',
-             'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og']
+             'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og')
 
 
-if __name__ == '__main__':
-    atom1 = Atom(6, [0.0,0.0,0.5])
-    atom2 = Atom(6, [1/3, 1/3, 0.5])
-    atom3 = Atom(1, [0, 0, 0.55])
-    atom4 = Atom(1, [1/3, 1/3, 0.45])
-    atom_x1 = Atom(6, [0.0, 0.0, 0.0])
-    atom_x2 = Atom(6, [0.0, 1.47, 0.0])
-    #atom5 = Atom(79, [2/3, 2/3, 0.7])
-    # print(atom.species)
-    # print(atom.coordinates)
-    material = Material([atom1, atom3, atom2, atom4],
-                        lattice_constant = 2.467,
-                        bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
-                                          [np.sqrt(3)/2, 1/2, 0.0],
-                                          [0.0, 0.0, 20.0/2.467]])
-
-    graphene = Material([atom_x1, atom_x2],
-                        lattice_constant = 2.47,
-                        bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
-                                          [np.sqrt(3)/2, 1/2, 0.0],
-                                          [0.0, 0.0, 20.0/2.467]],
-                        crystallographic=False)
-
-    #print(material.bravais_lattice)
-    #material.write_xyz()
-    #material.write_xyz()
-    graphene.write_yaml()
-    #print(material.supercell_lattice(2*np.eye(3)))
-    #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
-    #print(material.reciprocal_lattice())
+#if __name__ == '__main__':

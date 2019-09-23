@@ -20,3 +20,8 @@
 '''
   Module potentials
 '''
+
+class Potential(object):
+  '''
+  Potencial define a potential energy among atoms.
+  '''

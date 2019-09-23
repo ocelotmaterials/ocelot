@@ -219,11 +219,11 @@ class Molecule(object):
 
     def bonds(self, tolerance = 0.3):
         topo_bonds = []
-        for atom1 in atoms:
-            for atom2 in atoms:
+        for atom1 in self.atoms:
+            for atom2 in self.atoms:
                 d = euclidean(atom1.coordinates, atom2.coordinates)
                 if d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance):
-                    topo_bonds.append(d)
+                    topo_bonds.append([atom1.species1, atom2.species, d])
         return topo_bonds
 
     def angles(self):
@@ -234,6 +234,9 @@ class Molecule(object):
 
     def improper(self):
         pass # TODO
+
+    def from_xyz(self):
+        pass
 
 # class ReciprocalLattice(object):
 # class Supercell(object):

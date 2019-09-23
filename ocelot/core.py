@@ -223,7 +223,7 @@ class Molecule(object):
             for atom2 in self.atoms:
                 d = euclidean(atom1.coordinates, atom2.coordinates)
                 if d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance):
-                    topo_bonds.append([atom1.species1, atom2.species, d])
+                    topo_bonds.append([atom1.species, atom2.species, d])
         return topo_bonds
 
     def angles(self):
@@ -236,12 +236,12 @@ class Molecule(object):
         pass # TODO
 
     def from_xyz(self):
-        pass
+        pass # TODO
 
 # class ReciprocalLattice(object):
 # class Supercell(object):
 
-class KGrid(object):
+class KGrid(Material):
     '''
     k points sample in Brillouin Zone for a Material object.
     By default, using Monkhorst-Pack algorithm [Phys. Rev. B 13, 5188 (1976)].

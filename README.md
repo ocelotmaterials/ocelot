@@ -1,4 +1,6 @@
-[![Image](https://github.com/ocelot-quantum/ocelot/blob/master/logo.png)](https://ocelot-quantum.org/)
+<p align="center"> <a href="https://ocelot-quantum.org/">
+<img src="https://raw.githubusercontent.com/ocelot-quantum/ocelot/master/logo.png" style="height: 120px">
+</a></p>
 
 Ocelot is an open-source framework for quantum simulation of materials in quantum computers.
 

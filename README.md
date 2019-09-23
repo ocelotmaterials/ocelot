@@ -2,7 +2,7 @@
 
 Ocelot is an open-source framework for quantum simulation of materials in quantum computers.
 
-![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)  ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/ocelot-quantum/ocelot?style=for-the-badge)
+![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)    ![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)  ![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)
 
 ## Installation
 

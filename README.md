@@ -2,14 +2,16 @@
 
 Ocelot is an open-source framework for quantum simulation of materials in quantum computers.
 
+![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)  ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/ocelot-quantum/ocelot?style=for-the-badge)
+
 ## Installation
 
-The best way to install ocelot is with pip:
+The best way of installing ocelot is using pip:
 ```bash
 $ pip install ocelot-quantum
 ``` 
 
-For the latest cutting edge version, you can install ocelot with:
+For the latest cutting edge version, install with:
 ```bash
 $ git clone https://github.com/ocelot-quantum/ocelot.git
 $ cd ocelot
@@ -20,12 +22,12 @@ $ python setup.py install
 
 ```python
 import numpy as np
-import ocelot as oct
+import ocelot as ocl
 
-carbon1 = oct.Atom(6, [0.0, 0.0, 0.0])
-carbon2 = oct.Atom(6, [1/3, 1/3, 0.0])
+carbon1 = ocl.Atom(6, [0.0, 0.0, 0.5])
+carbon2 = ocl.Atom(6, [1/3, 1/3, 0.5])
 
-graphene = oct.Material([carbon1, carbon2],
+graphene = ocl.Material([carbon1, carbon2],
                         lattice_constant = 2.46,
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2,  1/2, 0.0],
@@ -33,5 +35,6 @@ graphene = oct.Material([carbon1, carbon2],
 ```
 
 ## License
+This is an open source code under Apache license 2.0
 
 [Apache License 2.0](LICENSE.txt)

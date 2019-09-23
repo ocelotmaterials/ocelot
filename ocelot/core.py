@@ -248,7 +248,8 @@ class Molecule(object):
                     topo_bonds.append([atom1.species, atom2.species, d])
         return topo_bonds
 
-    def angles(self):
+    def angles(self, tolerance = 0.3):
+        bonds = self.bonds(tolerance)
         pass # TODO
 
     def dihedral(self):

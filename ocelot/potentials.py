@@ -18,10 +18,15 @@
 #   limitations under the License.
 
 '''
-  Module potentials
+  Module potentials for intermolecular interactions
 '''
 
 class Potential(object):
   '''
   Potencial define a potential energy among atoms.
   '''
+  def lennard_jones(atom1, atom2):
+    pass
+
+  def coulomb(atom1,atom2):
+    pass

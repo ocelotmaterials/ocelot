@@ -25,9 +25,9 @@ graphene = oct.Material([atom_x1, atom_x2],
                         crystallographic=False)
 
 #print(material.bravais_lattice)
-#material.write_xyz()
-#material.write_xyz()
-graphene.write_yaml()
+material.write_xyz()
+#graphene.write_xyz()
+#graphene.write_yaml()
 #print(material.supercell_lattice(2*np.eye(3)))
 #material.to_dataframe().to_csv("out.csv", index=False, encoding='utf-8')
 #print(material.reciprocal_lattice())

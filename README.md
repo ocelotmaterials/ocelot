@@ -6,14 +6,14 @@ Ocelot is an open-source framework for quantum simulation of materials in quantu
 
 The best way to install ocelot is with pip:
 ```bash
-pip install ocelot-quantum
+$ pip install ocelot-quantum
 ``` 
 
-For developing version, you can install ocelot with:
+For the latest cutting edge version, you can install ocelot with:
 ```bash
-git clone https://github.com/ocelot-quantum/ocelot.git
-cd ocelot
-python setup.py install
+$ git clone https://github.com/ocelot-quantum/ocelot.git
+$ cd ocelot
+$ python setup.py install
 ```
 
 ## Getting started

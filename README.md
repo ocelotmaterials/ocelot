@@ -1,15 +1,15 @@
-![Image](https://github.com/ocelot-quantum/ocelot/blob/master/logo.png)
+[![Image](https://github.com/ocelot-quantum/ocelot/blob/master/logo.png)](https://ocelot-quantum.org/)
 
 Ocelot is an open-source framework for quantum simulation of materials in quantum computers.
 
-![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)    ![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)  ![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)
+[![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)](LICENSE.txt)    ![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)  [![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)](https://pypi.org/project/ocelot-quantum/)
 
 ## Installation
 
 The best way of installing ocelot is using pip:
 ```bash
 $ pip install ocelot-quantum
-``` 
+```
 
 For the latest cutting edge version, install with:
 ```bash

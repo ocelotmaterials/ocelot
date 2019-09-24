@@ -2,7 +2,7 @@
 <img src="https://raw.githubusercontent.com/ocelot-quantum/ocelot/master/logo.png" style="height: 100px">
 </a></p>
 
-[![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)](LICENSE.txt)    ![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)  [![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)](https://pypi.org/project/ocelot-quantum/)
+[![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)](LICENSE.txt)    [![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)](https://pypistats.org/packages/ocelot-quantum)  [![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)](https://pypi.org/project/ocelot-quantum/)
 
 (Under development). **Ocelot** is an open-source framework for quantum simulation of materials in quantum computers.
 

@@ -114,7 +114,26 @@ class Molecule(object):
 
     def from_xyz(self, filename):
         with open(filename, 'r', encoding="utf-8") as stream:
-            stream.read()
+            number_of_atoms = int(stream.readline())
+            comment = stream.readline()
+            species = []
+            coordinate_x = []
+            coordinate_y = []
+            coordinate_z = []
+            for atom in range(number_of_atoms):
+                line = stream.readline()
+                str_species, str_x, str_y, str_z = line.split()
+                species.append(chem_dict[str_species])
+                coordinate_x.append(float(str_x))
+                coordinate_y.append(float(str_y))
+                coordinate_z.append(float(str_z))
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['x'] = coordinate_x
+        df['y'] = coordinate_y
+        df['z'] = coordinate_z
+
     
     def to_dataframe(self):
         pass # TODO

@@ -27,7 +27,7 @@ from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
 import sys
-from .constants import chem, radius
+from .constants import chem, atomic_dict, radius
 
 class Atom(object):
     '''
@@ -123,7 +123,7 @@ class Molecule(object):
             for atom in range(number_of_atoms):
                 line = stream.readline()
                 str_species, str_x, str_y, str_z = line.split()
-                species.append(chem_dict[str_species])
+                species.append(atomic_dict[str_species])
                 coordinate_x.append(float(str_x))
                 coordinate_y.append(float(str_y))
                 coordinate_z.append(float(str_z))

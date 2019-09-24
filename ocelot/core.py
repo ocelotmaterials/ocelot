@@ -27,7 +27,7 @@ from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
 import sys
-from .constants import chem, atomic_dict, radius
+from .constants import element, atomic_number, covalent_radius vdW_radius
 
 class Atom(object):
     '''
@@ -99,7 +99,7 @@ class Molecule(object):
         for atom1 in self.atoms:
             for atom2 in self.atoms:
                 d = euclidean(atom1.coordinates, atom2.coordinates)
-                if (d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance)) and d > 0.0:
+                if (d < (covalent_radius[atom1.species]+covalent_radius[atom2.species])*(1+tolerance)) and d > 0.0:
                     topo_bonds.append([atom1.species, atom2.species, d])
         return topo_bonds
 
@@ -124,7 +124,7 @@ class Molecule(object):
             for atom in range(number_of_atoms):
                 line = stream.readline()
                 str_species, str_x, str_y, str_z = line.split()
-                species.append(atomic_dict[str_species])
+                species.append(atomic_number[str_species])
                 coordinate_x.append(float(str_x))
                 coordinate_y.append(float(str_y))
                 coordinate_z.append(float(str_z))
@@ -258,7 +258,7 @@ class Material(Atom):
         print("  ")   
         label = []
         for atom in list(df['Species']):
-            label.append(chem[atom])
+            label.append(element[atom])
         
         df['label'] = label
         if self.crystallographic:
@@ -290,7 +290,7 @@ class Material(Atom):
         unique_atoms = Counter(species)
         print("   ", end=" ")
         for unique_atom in unique_atoms:
-            print(chem[unique_atom], end=" ")
+            print(element[unique_atom], end=" ")
 
         print("\n   ", end=" ")
         for unique_atom in unique_atoms:

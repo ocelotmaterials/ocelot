@@ -37,6 +37,5 @@ graphene = ocl.Material([carbon1, carbon2],
 ```
 
 ## License
-This is an open source code under Apache license 2.0
 
-[Apache License 2.0](LICENSE.txt)
+This is an open source code under [Apache License 2.0](LICENSE.txt).

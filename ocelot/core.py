@@ -95,10 +95,11 @@ class Molecule(object):
 
     def bonds(self, tolerance = 0.3):
         topo_bonds = []
+        df = self.to_dataframe()
         for atom1 in self.atoms:
             for atom2 in self.atoms:
                 d = euclidean(atom1.coordinates, atom2.coordinates)
-                if d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance):
+                if (d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance)) and d > 0.0:
                     topo_bonds.append([atom1.species, atom2.species, d])
         return topo_bonds
 
@@ -136,7 +137,29 @@ class Molecule(object):
 
     
     def to_dataframe(self):
-        pass # TODO
+        '''
+        Convert a list of atoms in a Molecule object to a pandas DataFrame.
+        '''
+        species = []
+        for atom in self.atoms:
+            species.append(atom.species)
+
+        coordinates = []
+        for atom in self.atoms:
+            coordinates.append(atom.coordinates)
+
+        coordinate_x = np.array(coordinates)[:,0]
+        coordinate_y = np.array(coordinates)[:,1]
+        coordinate_z = np.array(coordinates)[:,2]
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['x'] = coordinate_x
+        df['y'] = coordinate_y
+        df['z'] = coordinate_z
+        df.sort_values('Species', inplace=True)
+        df = df.reset_index().drop(['index'], axis = 1)
+        return df
 
     def write_xyz(self):
         pass # TODO

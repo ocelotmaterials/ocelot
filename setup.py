@@ -25,14 +25,14 @@ requirements = [r.strip() for r in requirements]
 
 setup(
     name = "ocelot-quantum",
-    version = "0.0.3",
+    version = "0.0.4",
     packages = find_packages(),
     author = "Leandro Seixas",
     author_email = "leandro.seixas@mackenzie.br", 
     url="https://ocelot-quantum.org",
-    description = "Ocelot is a framework for quantum simulation of materials in quantum computers.",
+    description = "(Under development). Ocelot is a framework for quantum simulation of materials in quantum computers.",
     long_description='''
-    Ocelot is a framework for quantum simulation of materials in quantum computers.
+    (Under development). Ocelot is a framework for quantum simulation of materials in quantum computers.
     It is agnostic hardware, and can be used in annealer quantum computers and circuit model quantum computers. 
     ''',
     install_requires = requirements,

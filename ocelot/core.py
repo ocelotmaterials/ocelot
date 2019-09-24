@@ -64,6 +64,65 @@ class Atom(object):
         self.__coordinates = np.array(values)
 
 
+class Molecule(object):
+    '''
+    Molecule is defined by a list of atoms, charge and spin. 
+    '''
+    def __init__(self, atoms, charge = 0.0, spin = 0.0):
+        self.__atoms = atoms
+        self.__charge = charge
+        self.__spin = spin
+
+    @property
+    def atoms(self):
+        return self.__atoms
+
+    @property
+    def charge(self):
+        return self.__charge
+    
+    @charge.setter
+    def charge(self, value):
+        self.__charge = value
+
+    @property
+    def spin(self):
+        return self.__spin
+
+    @spin.setter
+    def spin(self, value):
+        self.__spin = value
+
+    def bonds(self, tolerance = 0.3):
+        topo_bonds = []
+        for atom1 in self.atoms:
+            for atom2 in self.atoms:
+                d = euclidean(atom1.coordinates, atom2.coordinates)
+                if d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance):
+                    topo_bonds.append([atom1.species, atom2.species, d])
+        return topo_bonds
+
+    def angles(self, tolerance = 0.3):
+        bonds = self.bonds(tolerance)
+        pass # TODO
+
+    def dihedral(self):
+        pass # TODO
+
+    def improper(self):
+        pass # TODO
+
+    def from_xyz(self, filename):
+        with open(filename, 'r', encoding="utf-8") as stream:
+            stream.read()
+    
+    def to_dataframe(self):
+        pass # TODO
+
+    def write_xyz(self):
+        pass # TODO
+
+
 class Material(Atom):
     '''
         Materials are defined by a list of atoms (object) and a Bravais lattice vector. 
@@ -209,58 +268,6 @@ class Material(Atom):
         self.__matrix = np.array(matrix)
         return self.bravais_lattice * self.__matrix
 
-
-class Molecule(object):
-    '''
-    Molecule is defined by a list of atoms, charge and spin. 
-    '''
-    def __init__(self, atoms, charge = 0.0, spin = 0.0):
-        self.__atoms = atoms
-        self.__charge = charge
-        self.__spin = spin
-
-    @property
-    def atoms(self):
-        return self.__atoms
-
-    @property
-    def charge(self):
-        return self.__charge
-    
-    @charge.setter
-    def charge(self, value):
-        self.__charge = value
-
-    @property
-    def spin(self):
-        return self.__spin
-
-    @spin.setter
-    def spin(self, value):
-        self.__spin = value
-
-    def bonds(self, tolerance = 0.3):
-        topo_bonds = []
-        for atom1 in self.atoms:
-            for atom2 in self.atoms:
-                d = euclidean(atom1.coordinates, atom2.coordinates)
-                if d < (radius[atom1.species]+radius[atom2.species])*(1+tolerance):
-                    topo_bonds.append([atom1.species, atom2.species, d])
-        return topo_bonds
-
-    def angles(self, tolerance = 0.3):
-        bonds = self.bonds(tolerance)
-        pass # TODO
-
-    def dihedral(self):
-        pass # TODO
-
-    def improper(self):
-        pass # TODO
-
-    def from_xyz(self, filename):
-        with open(filename, 'r', encoding="utf-8") as stream:
-            stream.read()
 
 # class ReciprocalLattice(object):
 # class Supercell(object):

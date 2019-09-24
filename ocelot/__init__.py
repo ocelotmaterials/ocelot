@@ -23,4 +23,4 @@ from .core import *
 #from .molecular import *
 #from .devices import *
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"

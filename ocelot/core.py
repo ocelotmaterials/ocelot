@@ -23,12 +23,12 @@
 
 import numpy as np
 import pandas as pd
-# from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
 import sys
-from .constants import element, atomic_number, covalent_radius vdW_radius
+from constants import element, atomic_number, covalent_radius
 
 class Atom(object):
     '''
@@ -69,6 +69,8 @@ class Chemical(Atom):
     '''
     Abstract class to build Molecule and Material classes.
     '''
+
+    __metaclass__ = ABCMeta
 
     def to_dataframe(self):
         '''
@@ -118,35 +120,11 @@ class Chemical(Atom):
         df['z'] = coordinate_z
         # incomplete method
 
+    @abstractmethod
     def write_xyz(self):
-        '''
-        Write an ocelot Material object as a xyz file.
-        '''
-        
-        df = self.to_dataframe()
-        print(df.shape[0])
-        print("  ")   
-        label = []
-        for atom in list(df['Species']):
-            label.append(element[atom])
-        
-        df['label'] = label
-        if self.crystallographic:
-            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
-            df['x_cart'] = atoms_xyz[:,0]
-            df['y_cart'] = atoms_xyz[:,1]
-            df['z_cart'] = atoms_xyz[:,2]
-            df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
-            for row in df.iterrows()[1]:
-                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
-        else:
-            atoms_xyz = np.array(df[['x', 'y', 'z']])
-            df = df[['label', 'x', 'y', 'z']]
-            for row in df.iterrows()[1]:
-                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
+        pass
 
 
-# TODO: replace to Molecule(Chemistry) with parent methods
 class Molecule(Chemical):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
@@ -196,6 +174,24 @@ class Molecule(Chemical):
 
     def improper(self):
         pass # TODO
+
+    def write_xyz(self):
+        '''
+        Write xyz file of a Molecule object.
+        '''
+        
+        df = self.to_dataframe()
+        print(df.shape[0])
+        print("  ")   
+        label = []
+        for atom in list(df['Species']):
+            label.append(element[atom])
+        
+        df['label'] = label
+        atoms_xyz = np.array(df[['x', 'y', 'z']])
+        df = df[['label', 'x', 'y', 'z']]
+        for index, row in df.iterrows():
+            print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
 
 
 class Material(Chemical):
@@ -255,6 +251,33 @@ class Material(Chemical):
     #def read_yaml(self,filename):
     #    df = pd.read_yaml(sys.argv[1])
     # TODO
+
+    def write_xyz(self):
+        '''
+        Write xyz file of a Material object.
+        '''
+        
+        df = self.to_dataframe()
+        print(df.shape[0])
+        print("  ")   
+        label = []
+        for atom in list(df['Species']):
+            label.append(element[atom])
+        
+        df['label'] = label
+        if self.crystallographic:
+            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
+            df['x_cart'] = atoms_xyz[:,0]
+            df['y_cart'] = atoms_xyz[:,1]
+            df['z_cart'] = atoms_xyz[:,2]
+            df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
+            for index, row in df.iterrows():
+                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
+        else:
+            atoms_xyz = np.array(df[['x', 'y', 'z']])
+            df = df[['label', 'x', 'y', 'z']]
+            for index, row in df.iterrows():
+                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
 
     def write_poscar(self):
         '''
@@ -316,3 +339,21 @@ class Planewave(KGrid):
     def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
         self.__energy_cutoff = energy_cutoff
         self.__energy_unit = energy_unit
+
+
+# testing module core
+if __name__ == '__main__':
+    atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
+    atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
+    atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
+    atom4 = Atom(1, [0.37285, 1.83372, 1.81325])
+    atom5 = Atom(1, [0.37294, 1.05973, 0.17061])
+
+    #methane = Molecule([atom1, atom2, atom3, atom4, atom5])
+
+    #print(methane.to_dataframe())
+    #methane.write_xyz()
+
+    # test from_xyz() method
+    methane = Molecule().from_xyz("./methane.xyz")
+    print(methane.to_dataframe())

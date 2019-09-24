@@ -1,5 +1,5 @@
 import numpy as np
-import ocelot.core as ocl
+#import ocelot.core as ocl
 
 
 # atom1 = ocl.Atom(6, [0.0,0.0,0.5])

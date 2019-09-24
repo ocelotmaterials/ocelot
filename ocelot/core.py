@@ -23,6 +23,7 @@
 
 import numpy as np
 import pandas as pd
+from abc import ABCMeta, abstractmethod
 from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
@@ -64,7 +65,24 @@ class Atom(object):
         self.__coordinates = np.array(values)
 
 
-class Molecule(object):
+class Chemistry(Atom):
+    '''
+    Abstract class to build Molecule and Material classes.
+    '''
+
+    __metaclass__ = ABCMeta
+
+    def to_dataframe(self):
+        pass
+
+    def write_xyz(self):
+        pass
+
+    def read_xyz(self):
+        pass
+
+# TODO: replace to Molecule(Chemistry) with parent methods
+class Molecule(Atom):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
     '''

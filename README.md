@@ -1,5 +1,5 @@
 <p align="center"> <a href="https://ocelot-quantum.org/">
-<img src="https://raw.githubusercontent.com/ocelot-quantum/ocelot/master/logo.png" style="height: 100px">
+<img src="https://raw.githubusercontent.com/ocelot-quantum/ocelot/master/logo.png" style="height: 90px">
 </a></p>
 
 [![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=brightgreen&style=for-the-badge)](LICENSE.txt)    [![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)](https://pypistats.org/packages/ocelot-quantum)  [![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?style=for-the-badge)](https://pypi.org/project/ocelot-quantum/)
@@ -33,7 +33,8 @@ graphene = ocl.Material([carbon1, carbon2],
                         lattice_constant = 2.46,
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2,  1/2, 0.0],
-                                          [0.0, 0.0, 20.0/2.46]])
+                                          [0.0, 0.0, 20.0/2.46]],
+                        crystallographic = True)
 ```
 
 ## License

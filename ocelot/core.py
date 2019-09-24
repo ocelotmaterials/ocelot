@@ -23,7 +23,7 @@
 
 import numpy as np
 import pandas as pd
-from abc import ABCMeta, abstractmethod
+# from abc import ABCMeta, abstractmethod
 from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
@@ -65,31 +65,97 @@ class Atom(object):
         self.__coordinates = np.array(values)
 
 
-class Chemistry(Atom):
+class Chemical(Atom):
     '''
     Abstract class to build Molecule and Material classes.
     '''
 
-    __metaclass__ = ABCMeta
-
     def to_dataframe(self):
-        pass
+        '''
+        Convert a list of atoms in a pandas data frame.
+        '''
+        species = []
+        for atom in self.atoms:
+            species.append(atom.species)
+
+        coordinates = []
+        for atom in self.atoms:
+            coordinates.append(atom.coordinates)
+
+        coordinate_x = np.array(coordinates)[:,0]
+        coordinate_y = np.array(coordinates)[:,1]
+        coordinate_z = np.array(coordinates)[:,2]
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['x'] = coordinate_x
+        df['y'] = coordinate_y
+        df['z'] = coordinate_z
+        df.sort_values('Species', inplace=True)
+        df = df.reset_index().drop(['index'], axis = 1)
+        return df
+
+    def from_xyz(self, filename):
+        with open(filename, 'r', encoding="utf-8") as stream:
+            number_of_atoms = int(stream.readline())
+            comment = stream.readline()
+            species = []
+            coordinate_x = []
+            coordinate_y = []
+            coordinate_z = []
+            for atom in range(number_of_atoms):
+                line = stream.readline()
+                str_species, str_x, str_y, str_z = line.split()
+                species.append(atomic_number[str_species])
+                coordinate_x.append(float(str_x))
+                coordinate_y.append(float(str_y))
+                coordinate_z.append(float(str_z))
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['x'] = coordinate_x
+        df['y'] = coordinate_y
+        df['z'] = coordinate_z
+        # incomplete method
 
     def write_xyz(self):
-        pass
+        '''
+        Write an ocelot Material object as a xyz file.
+        '''
+        
+        df = self.to_dataframe()
+        print(df.shape[0])
+        print("  ")   
+        label = []
+        for atom in list(df['Species']):
+            label.append(element[atom])
+        
+        df['label'] = label
+        if self.crystallographic:
+            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
+            df['x_cart'] = atoms_xyz[:,0]
+            df['y_cart'] = atoms_xyz[:,1]
+            df['z_cart'] = atoms_xyz[:,2]
+            df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
+            for row in df.iterrows()[1]:
+                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
+        else:
+            atoms_xyz = np.array(df[['x', 'y', 'z']])
+            df = df[['label', 'x', 'y', 'z']]
+            for row in df.iterrows()[1]:
+                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
 
-    def read_xyz(self):
-        pass
 
 # TODO: replace to Molecule(Chemistry) with parent methods
-class Molecule(Atom):
+class Molecule(Chemical):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
     '''
-    def __init__(self, atoms, charge = 0.0, spin = 0.0):
+    def __init__(self, atoms, charge = 0.0, spin = 0.0, vacuum = 15.0):
         self.__atoms = atoms
         self.__charge = charge
         self.__spin = spin
+        self.__vacuum = vacuum
 
     @property
     def atoms(self):
@@ -131,61 +197,10 @@ class Molecule(Atom):
     def improper(self):
         pass # TODO
 
-    def from_xyz(self, filename):
-        with open(filename, 'r', encoding="utf-8") as stream:
-            number_of_atoms = int(stream.readline())
-            comment = stream.readline()
-            species = []
-            coordinate_x = []
-            coordinate_y = []
-            coordinate_z = []
-            for atom in range(number_of_atoms):
-                line = stream.readline()
-                str_species, str_x, str_y, str_z = line.split()
-                species.append(atomic_number[str_species])
-                coordinate_x.append(float(str_x))
-                coordinate_y.append(float(str_y))
-                coordinate_z.append(float(str_z))
 
-        df = pd.DataFrame()
-        df['Species'] = species
-        df['x'] = coordinate_x
-        df['y'] = coordinate_y
-        df['z'] = coordinate_z
-
-    
-    def to_dataframe(self):
-        '''
-        Convert a list of atoms in a Molecule object to a pandas DataFrame.
-        '''
-        species = []
-        for atom in self.atoms:
-            species.append(atom.species)
-
-        coordinates = []
-        for atom in self.atoms:
-            coordinates.append(atom.coordinates)
-
-        coordinate_x = np.array(coordinates)[:,0]
-        coordinate_y = np.array(coordinates)[:,1]
-        coordinate_z = np.array(coordinates)[:,2]
-
-        df = pd.DataFrame()
-        df['Species'] = species
-        df['x'] = coordinate_x
-        df['y'] = coordinate_y
-        df['z'] = coordinate_z
-        df.sort_values('Species', inplace=True)
-        df = df.reset_index().drop(['index'], axis = 1)
-        return df
-
-    def write_xyz(self):
-        pass # TODO
-
-
-class Material(Atom):
+class Material(Chemical):
     '''
-        Materials are defined by a list of atoms (object) and a Bravais lattice vector. 
+        Materials are defined by a list of atoms (object) and Bravais lattice vectors. 
     '''
     def __init__(self, atoms, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic=True):
         self.__atoms = atoms
@@ -223,31 +238,6 @@ class Material(Atom):
     def bravais_lattice(self):
         return np.array(self.__bravais_vector) * self.__lattice_constant
 
-    def to_dataframe(self):
-        '''
-        Convert a list of atoms in a Material object to a pandas DataFrame.
-        '''
-        species = []
-        for atom in self.atoms:
-            species.append(atom.species)
-
-        coordinates = []
-        for atom in self.atoms:
-            coordinates.append(atom.coordinates)
-
-        coordinate_x = np.array(coordinates)[:,0]
-        coordinate_y = np.array(coordinates)[:,1]
-        coordinate_z = np.array(coordinates)[:,2]
-
-        df = pd.DataFrame()
-        df['Species'] = species
-        df['x'] = coordinate_x
-        df['y'] = coordinate_y
-        df['z'] = coordinate_z
-        df.sort_values('Species', inplace=True)
-        df = df.reset_index().drop(['index'], axis = 1)
-        return df
-
     def write_yaml(self):
         '''
         Write an ocelot Materials object as a YAML file.
@@ -265,34 +255,6 @@ class Material(Atom):
     #def read_yaml(self,filename):
     #    df = pd.read_yaml(sys.argv[1])
     # TODO
-
-    def write_xyz(self):
-        '''
-        Write an ocelot Material object as a xyz file.
-        '''
-        
-        df = self.to_dataframe()
-        print(df.shape[0])
-        print("  ")   
-        label = []
-        for atom in list(df['Species']):
-            label.append(element[atom])
-        
-        df['label'] = label
-        if self.crystallographic:
-            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
-            df['x_cart'] = atoms_xyz[:,0]
-            df['y_cart'] = atoms_xyz[:,1]
-            df['z_cart'] = atoms_xyz[:,2]
-            df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
-            for row in df.iterrows()[1]:
-                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
-        else:
-            atoms_xyz = np.array(df[['x', 'y', 'z']])
-            df = df[['label', 'x', 'y', 'z']]
-            for row in df.iterrows()[1]:
-                print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
-
 
     def write_poscar(self):
         '''

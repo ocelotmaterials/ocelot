@@ -80,7 +80,7 @@ class Chemical(Atom):
         '''
         species = []
         for atom in self.atoms:
-            species.append(atom.species)
+            species.append(int(atom.species))
 
         coordinates = []
         for atom in self.atoms:
@@ -149,9 +149,9 @@ class Molecule(Chemical):
     def vacuum(self, value):
         self.__vacuum = value
 
-    def bonds(self, tolerance = 0.3):
+    def bonds(self, tolerance = 0.1):
         '''
-        Return a data frame with bonds among atoms in a Molecule object.
+        Return a data frame with bonds among atoms of a molecule object.
         Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
         '''
         bonds_topology = []
@@ -171,9 +171,9 @@ class Molecule(Chemical):
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
 
-    def angles(self, tolerance = 0.3):
+    def angles(self, tolerance = 0.1):
         '''
-        Return angles between bonds in a Molecule object.
+        Return a data frame of angles between bonds of a molecule object.
         '''
         bonds_df = self.bonds(tolerance)
         angles = []
@@ -192,8 +192,12 @@ class Molecule(Chemical):
         angles_df['Angle'] = angles
         return angles_df
 
-    def dihedral(self):
-        pass # TODO
+    def dihedral(self, tolerance = 0.1):
+        '''
+        Return a data frame of dihedral (proper) angles of a molecule object.
+        '''
+        angles_df = self.angles(tolerance)
+        # TODO
 
     def improper(self):
         pass # TODO
@@ -215,16 +219,16 @@ class Molecule(Chemical):
             molecule = Molecule()
             molecule.from_xyz('./molecule.xyz')
         '''
+        species = []
+        coordinate_x = []
+        coordinate_y = []
+        coordinate_z = []
         with open(filename, 'r', encoding="utf-8") as stream:
             number_of_atoms = int(stream.readline())
             comment = stream.readline()
-            species = []
-            coordinate_x = []
-            coordinate_y = []
-            coordinate_z = []
             for index in range(number_of_atoms):
-                line = stream.readline()
-                str_species, str_x, str_y, str_z = line.split()
+                str_atom = stream.readline()
+                str_species, str_x, str_y, str_z = str_atom.split()
                 species.append(atomic_number[str_species.strip()])
                 coordinate_x.append(float(str_x))
                 coordinate_y.append(float(str_y))
@@ -427,20 +431,30 @@ if __name__ == '__main__':
     atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
     atom4 = Atom(1, [0.37285, 1.83372, 1.81325])
     atom5 = Atom(1, [0.37294, 1.05973, 0.17061])
-
     #methane = Molecule([atom1, atom2, atom3, atom4, atom5])
-
-    #print(methane.to_dataframe())
     #methane.write_xyz()
 
-    # test from_xyz() method
     methane = Molecule()
     methane.from_xyz("./methane.xyz")
-    #methane.write_xyz()
-    #print(methane.to_dataframe())
-    print('Bonds dataframe:')
-    print(methane.bonds(tolerance = 0.3))
+    print("Molecule dataframe:")
+    print(methane.to_dataframe())
+
+    print('\nBonds dataframe:')
+    print(methane.bonds(tolerance = 0.1))
+
     print('\nAngles dataframe:')
-    print(methane.angles(tolerance = 0.3))
-    print('\nMolecule box:')
-    print(methane.molecule_box())
+    print(methane.angles(tolerance = 0.1))
+
+    #methane.angles().to_csv('angles.csv', encoding='utf-8', index=False)
+    # print('\nMolecule box:')
+    # print(methane.molecule_box())
+
+    # molecule = Molecule()
+    # molecule.from_xyz("./test.xyz")
+    # print("Molecule dataframe")
+    # print(molecule.to_dataframe())
+    # print('Bonds dataframe:')
+    # print(molecule.bonds(tolerance = 0.1))
+    # print('\nAngles dataframe:')
+    # print(molecule.angles(tolerance = 0.1))
+

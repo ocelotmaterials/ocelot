@@ -225,12 +225,15 @@ class Molecule(Chemical):
         delta_z = df['z'].max() - df['z'].min()
         return np.diag([delta_x, delta_y, delta_z])+self.vacuum*np.eye(3)
 
-    def shift(self, vector = np.array([0.0, 0.0, 0.0])):
-        for atom in self.atoms:
-            atom.coordinates += vector
+    def move(self, vector = np.array([0.0, 0.0, 0.0])):
+        import copy
+        new_molecule = copy.deepcopy(self)
+        for atom in new_molecule.atoms:
+                atom.coordinates += vector
+        return new_molecule
 
     def rotate(self, angle = 0.0, vector = np.array([0.0, 0.0, 1.0])):
-        from scipy.spatical.transform import Rotation
+        from scipy.spatial.transform import Rotation
         rot = Rotation.from_rotvec(angle*vector)
         df = self.to_dataframe()
         matrix = np.array(df[['x', 'y', 'z']])
@@ -450,11 +453,11 @@ class Planewave(KGrid):
 # testing module core
 if __name__ == '__main__':
     from constants import element_tuple, atomic_number, covalent_radius
-    atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
-    atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
-    atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
-    atom4 = Atom(1, [0.37285, 1.83372, 1.81325])
-    atom5 = Atom(1, [0.37294, 1.05973, 0.17061])
+    # atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
+    # atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
+    # atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
+    # atom4 = Atom(1, [0.37285, 1.83372, 1.81325])
+    # atom5 = Atom(1, [0.37294, 1.05973, 0.17061])
     #methane = Molecule([atom1, atom2, atom3, atom4, atom5])
     #methane.write_xyz()
 
@@ -476,7 +479,7 @@ if __name__ == '__main__':
     molecule = Molecule()
     molecule.from_xyz("./test.xyz")
     print("Molecule dataframe")
-    print(molecule.to_dataframe())
+    print(molecule.move([0.0, 0.0, 5.0]).to_dataframe())
 
     print('\nBonds dataframe:')
     print(molecule.bonds(tolerance = 0.1))

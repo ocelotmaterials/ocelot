@@ -27,32 +27,50 @@ from abc import ABCMeta, abstractmethod
 from collections import Counter
 import yaml
 import sys
-from .constants import element, atomic_number, covalent_radius # comment this line to test
+from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
-        Atom class, defined by chemical species (atomic number), and coordinates (numpy array).
+        Atom class, defined by chemical element (atomic number), electric charge, and coordinates (numpy array).
     '''
-    def __init__(self, species = 0, coordinates = np.array([0.0, 0.0, 0.0])):
+    def __init__(self, element = 0, charge = 0.0, spin = 0.0, coordinates = np.array([0.0, 0.0, 0.0])):
         '''
         Atom object constructor.
         '''
-        if ((species < 0) or (species > 118)): 
-            raise Exception("Species should be defined by atomic number between 0 and 118.")
-        self.__species = species
+        if ((element < 0) or (element > 118)): 
+            raise Exception("Element should be defined by atomic number between 0 and 118.")
+        self.__element = element
+        self.__charge = charge
+        self.__spin = spin
         self.__coordinates = np.array(coordinates)
 
     @property
-    def species(self):
-        return self.__species
+    def element(self):
+        return self.__element
 
-    @species.setter
-    def species(self, value):
+    @element.setter
+    def element(self, value):
         if not isinstance(value,int):
-            raise TypeError("Atomic species should be defined by their atomic number.")
+            raise TypeError("Atomic element should be defined by their atomic number.")
         elif ((value < 1) or (value > 118)):
             raise Exception("Atomic number must be a integer number between 1 and 118.")
-        self.__species = value
+        self.__element = value
+
+    @property
+    def charge(self):
+        return self.__charge
+
+    @charge.setter
+    def charge(self, value):
+        self.__charge = value
+
+    @property
+    def spin(self):
+        return self.__spin
+
+    @spin.setter
+    def spin(self, value):
+        self.__spin = value
 
     @property
     def coordinates(self):
@@ -78,7 +96,7 @@ class Chemical(Atom):
         '''
         Convert a list of atoms in a pandas data frame.
         '''
-        species = [ int(atom.species) for atom in self.atoms ]
+        element = [ int(atom.element) for atom in self.atoms ]
         coordinates = [ atom.coordinates for atom in self.atoms ]
 
         coordinate_x = np.array(coordinates)[:,0]
@@ -86,11 +104,11 @@ class Chemical(Atom):
         coordinate_z = np.array(coordinates)[:,2]
 
         df = pd.DataFrame()
-        df['Species'] = species
+        df['element'] = element
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
-        df.sort_values('Species', inplace = True)
+        df.sort_values('element', inplace = True)
         df = df.reset_index().drop(['index'], axis = 1)
         return df
 
@@ -155,14 +173,14 @@ class Molecule(Chemical):
         for index1, atom1 in df.iterrows():
             for index2, atom2 in df.iterrows():
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
-                covalent_sum = covalent_radius[int(atom1['Species'])]+covalent_radius[int(atom2['Species'])]
+                covalent_sum = covalent_radius[int(atom1['element'])]+covalent_radius[int(atom2['element'])]
                 if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
                     bonds_topology.append([index1, index2, d])
                     directions.append((np.array(atom1[['x', 'y', 'z']], dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
         
-        bonds_df = pd.DataFrame(bonds_topology, columns = ['Atom 1', 'Atom 2', 'Distance'])
-        bonds_df['Direction'] = directions
-        bonds_df.sort_values('Distance', inplace = True)
+        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1', 'index 2', 'distance'])
+        bonds_df['direction'] = directions
+        bonds_df.sort_values('distance', inplace = True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
 
@@ -175,16 +193,16 @@ class Molecule(Chemical):
         indeces = []
         for index1, bond1 in bonds_df.iterrows():
             for index2, bond2 in bonds_df.iterrows():
-                union = set(bond1[['Atom 1', 'Atom 2']]).union(set(bond2[['Atom 1', 'Atom 2']]))
+                union = set(bond1[['index 1', 'index 2']]).union(set(bond2[['index 1', 'index 2']]))
                 if len(union) == 3 and (index2 > index1):
-                    dotproduct = np.dot(bond1['Direction'], bond2['Direction'])
-                    normalized_dotproduct = dotproduct/(np.linalg.norm(bond1['Direction'])*np.linalg.norm(bond2['Direction']))
+                    dotproduct = np.dot(bond1['direction'], bond2['direction'])
+                    normalized_dotproduct = dotproduct/(np.linalg.norm(bond1['direction'])*np.linalg.norm(bond2['direction']))
                     angle = np.arccos(np.clip(normalized_dotproduct, -1, 1))*180/np.pi
                     angles.append(angle)
                     indeces.append(list(union))
 
-        angles_df = pd.DataFrame(indeces, columns=['Atom 1', 'Atom 2', 'Atom 3'])
-        angles_df['Angle'] = angles
+        angles_df = pd.DataFrame(indeces, columns=['index 1', 'index 2', 'index 3'])
+        angles_df['angle'] = angles
         return angles_df
 
     def dihedral(self, tolerance = 0.1):
@@ -207,6 +225,15 @@ class Molecule(Chemical):
         delta_z = df['z'].max() - df['z'].min()
         return np.diag([delta_x, delta_y, delta_z])+self.vacuum*np.eye(3)
 
+    def shift(self, vector):
+        pass # TODO
+
+    def rotate(self, angle = 0.0, vector = np.array([0.0, 0.0, 1.0])):
+        pass # TODO
+
+    def join(self, molecule):
+        pass # TODO
+
     def from_xyz(self, filename):
         '''
         Set molecule object with data from xyz file.
@@ -214,7 +241,7 @@ class Molecule(Chemical):
             molecule = Molecule()
             molecule.from_xyz('./molecule.xyz')
         '''
-        species = []
+        element = []
         coordinate_x = []
         coordinate_y = []
         coordinate_z = []
@@ -223,21 +250,21 @@ class Molecule(Chemical):
             comment = stream.readline()
             for index in range(number_of_atoms):
                 str_atom = stream.readline()
-                str_species, str_x, str_y, str_z = str_atom.split()
-                species.append(atomic_number[str_species.strip()])
+                str_element, str_x, str_y, str_z = str_atom.split()
+                element.append(atomic_number[str_element.strip()])
                 coordinate_x.append(float(str_x))
                 coordinate_y.append(float(str_y))
                 coordinate_z.append(float(str_z))
 
         df = pd.DataFrame()
-        df['Species'] = species
+        df['element'] = element
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
 
         atoms_list = []
         for index, row in df.iterrows():
-            atom = Atom(species = row['Species'], coordinates = np.array(row[['x', 'y', 'z']]))
+            atom = Atom(element = row['element'], coordinates = np.array(row[['x', 'y', 'z']]))
             atoms_list.append(atom)
 
         self.__atoms = atoms_list
@@ -251,7 +278,7 @@ class Molecule(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = [element[int(atom)] for atom in list(df['Species'])]
+        label = [element_tuple[int(atom)] for atom in list(df['element'])]
         
         df['label'] = label
         df = df[['label', 'x', 'y', 'z']]
@@ -328,7 +355,7 @@ class Material(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = [element[atom] for atom in list(df['Species'])]
+        label = [element_tuple[atom] for atom in list(df['element'])]
         
         df['label'] = label
         if self.crystallographic:
@@ -356,11 +383,11 @@ class Material(Chemical):
         print("    {:.8f}  {:.8f}  {:.8f}".format(bravais[1][0], bravais[1][1], bravais[1][2]))
         print("    {:.8f}  {:.8f}  {:.8f}".format(bravais[2][0], bravais[2][1], bravais[2][2]))
         
-        species = self.to_dataframe()['Species']
-        unique_atoms = Counter(species)
+        element = self.to_dataframe()['element']
+        unique_atoms = Counter(element)
         print("   ", end = " ")
         for unique_atom in unique_atoms:
-            print(element[unique_atom], end = " ")
+            print(element_tuple[unique_atom], end = " ")
 
         print("\n   ", end = " ")
         for unique_atom in unique_atoms:
@@ -416,7 +443,7 @@ class Planewave(KGrid):
 
 # testing module core
 if __name__ == '__main__':
-    from constants import element, atomic_number, covalent_radius
+    from constants import element_tuple, atomic_number, covalent_radius
     atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
     atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
     atom3 = Atom(1, [1.93983, 1.32622, 1.04881])

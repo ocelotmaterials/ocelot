@@ -26,10 +26,10 @@ $ python setup.py install
 import numpy as np
 import ocelot as ocl
 
-carbon1 = ocl.Atom(6, [0.0, 0.0, 0.5])
-carbon2 = ocl.Atom(6, [1/3, 1/3, 0.5])
+carbon1 = ocl.Atom(element = 6, coordinates = [0.0, 0.0, 0.5])
+carbon2 = ocl.Atom(element = 6, coordinates = [1/3, 1/3, 0.5])
 
-graphene = ocl.Material([carbon1, carbon2],
+graphene = ocl.Material(atoms = [carbon1, carbon2],
                         lattice_constant = 2.46,
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2,  1/2, 0.0],

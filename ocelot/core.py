@@ -141,6 +141,14 @@ class Molecule(Chemical):
     def spin(self, value):
         self.__spin = value
 
+    @property
+    def vacuum(self):
+        return self.__vacuum
+
+    @vacuum.setter
+    def vacuum(self, value):
+        self.__vacuum = value
+
     def bonds(self, tolerance = 0.3):
         '''
         Return a data frame with bonds among atoms in a Molecule object.
@@ -190,14 +198,23 @@ class Molecule(Chemical):
     def improper(self):
         pass # TODO
 
-    def molecule_sizes(self):
+    def molecule_box(self):
         '''
-        Return array [d1, d2, d3], with d1 = x_max - x_min, d2 = y_max - y_min, d3 = z_max - z_min
+        Return a array with molecule dimensions plus vacuum spacing.
         '''
-        pass
+        df = self.to_dataframe()
+        delta_x = df['x'].max() - df['x'].min()
+        delta_y = df['y'].max() - df['y'].min()
+        delta_z = df['z'].max() - df['z'].min()
+        return np.diag([delta_x, delta_y, delta_z])+self.vacuum*np.eye(3)
 
     def from_xyz(self, filename):
-        # filename = sys.argv[1]
+        '''
+        Set molecule object with data from xyz file.
+        Usage:
+            molecule = Molecule()
+            molecule.from_xyz('./molecule.xyz')
+        '''
         with open(filename, 'r', encoding="utf-8") as stream:
             number_of_atoms = int(stream.readline())
             comment = stream.readline()
@@ -225,7 +242,7 @@ class Molecule(Chemical):
             atoms_list.append(atom)
 
         self.__atoms = atoms_list
-        # self.__vacuum = ... # resize vaccum with molecule size + 15.0
+        # end of from_xyz() method
 
     def write_xyz(self):
         '''
@@ -243,7 +260,7 @@ class Molecule(Chemical):
         df = df[['label', 'x', 'y', 'z']]
         for index, row in df.iterrows():
             print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
-
+        # end of write_xyz() method
 
 class Material(Chemical):
     '''
@@ -421,7 +438,9 @@ if __name__ == '__main__':
     methane.from_xyz("./methane.xyz")
     #methane.write_xyz()
     #print(methane.to_dataframe())
-    print('Bonds dataframe')
+    print('Bonds dataframe:')
     print(methane.bonds(tolerance = 0.3))
-    print('Angles dataframe')
+    print('\nAngles dataframe:')
     print(methane.angles(tolerance = 0.3))
+    print('\nMolecule box:')
+    print(methane.molecule_box())

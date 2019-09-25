@@ -78,13 +78,8 @@ class Chemical(Atom):
         '''
         Convert a list of atoms in a pandas data frame.
         '''
-        species = []
-        for atom in self.atoms:
-            species.append(int(atom.species))
-
-        coordinates = []
-        for atom in self.atoms:
-            coordinates.append(atom.coordinates)
+        species = [ int(atom.species) for atom in self.atoms ]
+        coordinates = [ atom.coordinates for atom in self.atoms ]
 
         coordinate_x = np.array(coordinates)[:,0]
         coordinate_y = np.array(coordinates)[:,1]
@@ -256,9 +251,7 @@ class Molecule(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = []
-        for atom in list(df['Species']):
-            label.append(element[int(atom)])
+        label = [element[int(atom)] for atom in list(df['Species'])]
         
         df['label'] = label
         df = df[['label', 'x', 'y', 'z']]
@@ -335,9 +328,7 @@ class Material(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = []
-        for atom in list(df['Species']):
-            label.append(element[atom])
+        label = [element[atom] for atom in list(df['Species'])]
         
         df['label'] = label
         if self.crystallographic:

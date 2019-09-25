@@ -143,14 +143,22 @@ class Molecule(Chemical):
         self.__spin = value
 
     def bonds(self, tolerance = 0.3):
-        topo_bonds = []
+        '''
+        Return a data frame with bonds among atoms in a Molecule object.
+        Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
+        '''
+        bonds_topology = []
         df = self.to_dataframe()
-        for atom1 in self.atoms:
-            for atom2 in self.atoms:
-                d = euclidean(atom1.coordinates, atom2.coordinates)
-                if (d < (covalent_radius[atom1.species]+covalent_radius[atom2.species])*(1+tolerance)) and d > 0.0:
-                    topo_bonds.append([atom1.species, atom2.species, d])
-        return topo_bonds
+        for index1, row1 in df.iterrows():
+            for index2, row2 in df.iterrows():
+                d = euclidean(row1[['x', 'y', 'z']], row2[['x', 'y', 'z']])
+                if (d < (covalent_radius[int(row1['Species'])]+covalent_radius[int(row2['Species'])])*(1+tolerance)) and (d > 0.0) and (index2 > index1):
+                    bonds_topology.append([index1, index2, d])
+        
+        bonds_df = pd.DataFrame(bonds_topology, columns = ['Atom 1', 'Atom 2', 'Distance'])
+        bonds_df.sort_values('Distance', inplace = True)
+        bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
+        return bonds_df
 
     def angles(self, tolerance = 0.3):
         bonds = self.bonds(tolerance)
@@ -161,6 +169,12 @@ class Molecule(Chemical):
 
     def improper(self):
         pass # TODO
+
+    def molecule_sizes(self):
+        '''
+        Return array [d1, d2, d3], with d1 = x_max - x_min, d2 = y_max - y_min, d3 = z_max - z_min
+        '''
+        pass
 
     def from_xyz(self, filename):
         # filename = sys.argv[1]
@@ -387,3 +401,4 @@ if __name__ == '__main__':
     methane.from_xyz("./methane.xyz")
     #methane.write_xyz()
     #print(methane.to_dataframe())
+    print(methane.bonds(tolerance = 0.3))

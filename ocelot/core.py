@@ -25,7 +25,6 @@ import numpy as np
 import pandas as pd
 from abc import ABCMeta, abstractmethod
 from collections import Counter
-from scipy.spatial.distance import euclidean
 import yaml
 import sys
 from .constants import element, atomic_number, covalent_radius # comment this line to test
@@ -148,21 +147,42 @@ class Molecule(Chemical):
         Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
         '''
         bonds_topology = []
+        directions = []
         df = self.to_dataframe()
-        for index1, row1 in df.iterrows():
-            for index2, row2 in df.iterrows():
-                d = euclidean(row1[['x', 'y', 'z']], row2[['x', 'y', 'z']])
-                if (d < (covalent_radius[int(row1['Species'])]+covalent_radius[int(row2['Species'])])*(1+tolerance)) and (d > 0.0) and (index2 > index1):
+        for index1, atom1 in df.iterrows():
+            for index2, atom2 in df.iterrows():
+                d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
+                covalent_sum = covalent_radius[int(atom1['Species'])]+covalent_radius[int(atom2['Species'])]
+                if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
                     bonds_topology.append([index1, index2, d])
+                    directions.append((np.array(atom1[['x', 'y', 'z']], dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
         
         bonds_df = pd.DataFrame(bonds_topology, columns = ['Atom 1', 'Atom 2', 'Distance'])
+        bonds_df['Direction'] = directions
         bonds_df.sort_values('Distance', inplace = True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
 
     def angles(self, tolerance = 0.3):
-        bonds = self.bonds(tolerance)
-        pass # TODO
+        '''
+        Return angles between bonds in a Molecule object.
+        '''
+        bonds_df = self.bonds(tolerance)
+        angles = []
+        indeces = []
+        for index1, bond1 in bonds_df.iterrows():
+            for index2, bond2 in bonds_df.iterrows():
+                union = set(bond1[['Atom 1', 'Atom 2']]).union(set(bond2[['Atom 1', 'Atom 2']]))
+                if len(union) == 3 and (index2 > index1):
+                    dotproduct = np.dot(bond1['Direction'], bond2['Direction'])
+                    normalized_dotproduct = dotproduct/(np.linalg.norm(bond1['Direction'])*np.linalg.norm(bond2['Direction']))
+                    angle = np.arccos(np.clip(normalized_dotproduct, -1, 1))*180/np.pi
+                    angles.append(angle)
+                    indeces.append(list(union))
+
+        angles_df = pd.DataFrame(indeces, columns=['Atom 1', 'Atom 2', 'Atom 3'])
+        angles_df['Angle'] = angles
+        return angles_df
 
     def dihedral(self):
         pass # TODO
@@ -401,4 +421,5 @@ if __name__ == '__main__':
     methane.from_xyz("./methane.xyz")
     #methane.write_xyz()
     #print(methane.to_dataframe())
-    print(methane.bonds(tolerance = 0.3))
+    #print(methane.bonds(tolerance = 0.3))
+    print(methane.angles(tolerance = 0.3))

@@ -225,11 +225,17 @@ class Molecule(Chemical):
         delta_z = df['z'].max() - df['z'].min()
         return np.diag([delta_x, delta_y, delta_z])+self.vacuum*np.eye(3)
 
-    def shift(self, vector):
-        pass # TODO
+    def shift(self, vector = np.array([0.0, 0.0, 0.0])):
+        for atom in self.atoms:
+            atom.coordinates += vector
 
     def rotate(self, angle = 0.0, vector = np.array([0.0, 0.0, 1.0])):
-        pass # TODO
+        from scipy.spatical.transform import Rotation
+        rot = Rotation.from_rotvec(angle*vector)
+        df = self.to_dataframe()
+        matrix = np.array(df[['x', 'y', 'z']])
+        new_matrix = np.matmul(matrix, rot)
+        # TODO
 
     def join(self, molecule):
         pass # TODO
@@ -452,27 +458,29 @@ if __name__ == '__main__':
     #methane = Molecule([atom1, atom2, atom3, atom4, atom5])
     #methane.write_xyz()
 
-    methane = Molecule()
-    methane.from_xyz("./methane.xyz")
-    print("Molecule dataframe:")
-    print(methane.to_dataframe())
+    # methane = Molecule()
+    # methane.from_xyz("./methane.xyz")
+    # print("Molecule dataframe:")
+    # print(methane.to_dataframe())
 
-    print('\nBonds dataframe:')
-    print(methane.bonds(tolerance = 0.1))
+    # print('\nBonds dataframe:')
+    # print(methane.bonds(tolerance = 0.1))
 
-    print('\nAngles dataframe:')
-    print(methane.angles(tolerance = 0.1))
+    # print('\nAngles dataframe:')
+    # print(methane.angles(tolerance = 0.1))
 
     #methane.angles().to_csv('angles.csv', encoding='utf-8', index=False)
     # print('\nMolecule box:')
     # print(methane.molecule_box())
 
-    # molecule = Molecule()
-    # molecule.from_xyz("./test.xyz")
-    # print("Molecule dataframe")
-    # print(molecule.to_dataframe())
-    # print('Bonds dataframe:')
-    # print(molecule.bonds(tolerance = 0.1))
-    # print('\nAngles dataframe:')
-    # print(molecule.angles(tolerance = 0.1))
+    molecule = Molecule()
+    molecule.from_xyz("./test.xyz")
+    print("Molecule dataframe")
+    print(molecule.to_dataframe())
+
+    print('\nBonds dataframe:')
+    print(molecule.bonds(tolerance = 0.1))
+
+    print('\nAngles dataframe:')
+    print(molecule.angles(tolerance = 0.1))
 

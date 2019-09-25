@@ -28,18 +28,18 @@ from collections import Counter
 from scipy.spatial.distance import euclidean
 import yaml
 import sys
-from constants import element, atomic_number, covalent_radius
+from .constants import element, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
         Atom class, defined by chemical species (atomic number), and coordinates (numpy array).
     '''
-    def __init__(self, species=0, coordinates = np.array([0.0, 0.0, 0.0])):
+    def __init__(self, species = 0, coordinates = np.array([0.0, 0.0, 0.0])):
         '''
         Atom object constructor.
         '''
-        if ((species < 1) or (species > 118)): 
-            raise Exception("Species should be defined by atomic number between 1 and 118.")
+        if ((species < 0) or (species > 118)): 
+            raise Exception("Species should be defined by atomic number between 0 and 118.")
         self.__species = species
         self.__coordinates = np.array(coordinates)
 
@@ -100,28 +100,9 @@ class Chemical(Atom):
         df = df.reset_index().drop(['index'], axis = 1)
         return df
 
+    @abstractmethod
     def from_xyz(self, filename):
-        with open(filename, 'r', encoding="utf-8") as stream:
-            number_of_atoms = int(stream.readline())
-            comment = stream.readline()
-            species = []
-            coordinate_x = []
-            coordinate_y = []
-            coordinate_z = []
-            for atom in range(number_of_atoms):
-                line = stream.readline()
-                str_species, str_x, str_y, str_z = line.split()
-                species.append(atomic_number[str_species])
-                coordinate_x.append(float(str_x))
-                coordinate_y.append(float(str_y))
-                coordinate_z.append(float(str_z))
-
-        df = pd.DataFrame()
-        df['Species'] = species
-        df['x'] = coordinate_x
-        df['y'] = coordinate_y
-        df['z'] = coordinate_z
-        # incomplete method
+        pass
 
     @abstractmethod
     def write_xyz(self):
@@ -132,7 +113,7 @@ class Molecule(Chemical):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
     '''
-    def __init__(self, atoms, charge = 0.0, spin = 0.0, vacuum = 15.0):
+    def __init__(self, atoms = [Atom()], charge = 0.0, spin = 0.0, vacuum = 15.0):
         '''
         Molecule object constructor.
         '''
@@ -181,6 +162,37 @@ class Molecule(Chemical):
     def improper(self):
         pass # TODO
 
+    def from_xyz(self, filename):
+        # filename = sys.argv[1]
+        with open(filename, 'r', encoding="utf-8") as stream:
+            number_of_atoms = int(stream.readline())
+            comment = stream.readline()
+            species = []
+            coordinate_x = []
+            coordinate_y = []
+            coordinate_z = []
+            for index in range(number_of_atoms):
+                line = stream.readline()
+                str_species, str_x, str_y, str_z = line.split()
+                species.append(atomic_number[str_species.strip()])
+                coordinate_x.append(float(str_x))
+                coordinate_y.append(float(str_y))
+                coordinate_z.append(float(str_z))
+
+        df = pd.DataFrame()
+        df['Species'] = species
+        df['x'] = coordinate_x
+        df['y'] = coordinate_y
+        df['z'] = coordinate_z
+
+        atoms_list = []
+        for index, row in df.iterrows():
+            atom = Atom(species = row['Species'], coordinates = np.array(row[['x', 'y', 'z']]))
+            atoms_list.append(atom)
+
+        self.__atoms = atoms_list
+        # self.__vacuum = ... # resize vaccum with molecule size + 15.0
+
     def write_xyz(self):
         '''
         Write xyz file of a Molecule object.
@@ -191,10 +203,9 @@ class Molecule(Chemical):
         print("  ")   
         label = []
         for atom in list(df['Species']):
-            label.append(element[atom])
+            label.append(element[int(atom)])
         
         df['label'] = label
-        atoms_xyz = np.array(df[['x', 'y', 'z']])
         df = df[['label', 'x', 'y', 'z']]
         for index, row in df.iterrows():
             print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
@@ -359,6 +370,7 @@ class Planewave(KGrid):
 
 # testing module core
 if __name__ == '__main__':
+    from constants import element, atomic_number, covalent_radius
     atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
     atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
     atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
@@ -371,5 +383,7 @@ if __name__ == '__main__':
     #methane.write_xyz()
 
     # test from_xyz() method
-    methane = Molecule().from_xyz("./methane.xyz")
-    print(methane.to_dataframe())
+    methane = Molecule()
+    methane.from_xyz("./methane.xyz")
+    #methane.write_xyz()
+    #print(methane.to_dataframe())

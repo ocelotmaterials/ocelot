@@ -421,5 +421,7 @@ if __name__ == '__main__':
     methane.from_xyz("./methane.xyz")
     #methane.write_xyz()
     #print(methane.to_dataframe())
-    #print(methane.bonds(tolerance = 0.3))
+    print('Bonds dataframe')
+    print(methane.bonds(tolerance = 0.3))
+    print('Angles dataframe')
     print(methane.angles(tolerance = 0.3))

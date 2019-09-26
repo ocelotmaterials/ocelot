@@ -18,15 +18,34 @@
 #   limitations under the License.
 
 '''
-  Module potentials for intermolecular interactions
+  Module for bonded and nonbonded potential energies for interactions between atoms.
 '''
 
 class Potential(object):
   '''
   Potencial define a potential energy among atoms.
   '''
-  def lennard_jones(atom1, atom2):
+
+  def __init__(self, mesh):
     pass
 
-  def coulomb(atom1,atom2):
+  def lennard_jones(self):
+    pass
+
+  def stillinger_weber(self):
+    pass
+
+  def coulomb(self):
+    pass
+
+  def harmonic_bonds(self):
+    pass
+
+  def harmonic_angles(self):
+    pass
+
+  def harmonic_dihedral(self):
+    pass
+
+  def harmonic_improper(self):
     pass

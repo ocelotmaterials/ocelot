@@ -247,7 +247,13 @@ class Molecule(Chemical):
         angles_df['angle'] = angles
         return angles_df
 
-    def dihedral(self, tolerance = 0.1):
+    def angles(self, tolerance = 0.1):
+        '''
+        Return a data frame of angles of a molecule object.
+        '''
+        pass # TODO
+
+    def dihedral_angles(self, tolerance = 0.1):
         '''
         Return a data frame of dihedral (proper) angles of a molecule object.
         '''
@@ -255,7 +261,10 @@ class Molecule(Chemical):
         # angles_df = self.angles(tolerance)
         # TODO
 
-    def improper(self):
+    def improper_angles(self):
+        '''
+        Return a data frame of improper torsion angles for a molecule object.
+        '''
         pass # TODO
 
     def molecule_box(self):
@@ -279,14 +288,16 @@ class Molecule(Chemical):
         import copy
         from scipy.spatial.transform import Rotation
         new_molecule = copy.deepcopy(self)
-        rot = Rotation.from_rotvec(angle*vector)
-        df = self.to_dataframe()
-        matrix = np.array(df[['x', 'y', 'z']])
-        new_matrix = np.matmul(matrix, rot)
+        rot = Rotation.from_rotvec(angle*(np.pi/180)*np.array(vector))
+        # use as: new_vector = rot.apply(vector)
+
+        # df = self.to_dataframe()
+        # matrix = np.array(df[['x', 'y', 'z']])
+        # new_matrix = np.matmul(matrix, rot)
         #df[['x', 'y', 'z']] = new_matrix
         #for atom in new_molecule.atoms:
         #    atom.coordinates = new_matrix[,:]
-        pass # TODO
+        # pass # TODO
 
     def join(self, molecule):
         pass # TODO
@@ -496,6 +507,14 @@ class Planewave(KGrid):
         '''
         self.__energy_cutoff = energy_cutoff
         self.__energy_unit = energy_unit
+
+
+class Operator(Planewave):
+    '''
+    Operator class in planewave basis
+    '''
+    def __init__(self):
+        pass
 
 
 # testing module core

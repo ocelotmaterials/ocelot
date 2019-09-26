@@ -490,6 +490,6 @@ if __name__ == '__main__':
     print('\nBonds dataframe:')
     print(molecule.bonds(tolerance = 0.1))
 
-    print('\nAngles dataframe:')
-    print(molecule.angles(tolerance = 0.1))
+    # print('\nAngles dataframe:')
+    # print(molecule.angles(tolerance = 0.1))
 

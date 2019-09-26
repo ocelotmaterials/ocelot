@@ -37,7 +37,7 @@ methane = ocl.Molecule(atoms = [carbon1, hydrogen1, hydrogen2, hydrogen3, hydrog
                        charge = 0.0,
                        spin = 0.0)
 
-# to build a graphene solid
+# to build a graphene sheet
 carbon1 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.0, 0.5])
 carbon2 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [1/3, 1/3, 0.5])
 

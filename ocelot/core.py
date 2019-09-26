@@ -31,7 +31,7 @@ from .constants import element_tuple, atomic_number, covalent_radius # comment t
 
 class Atom(object):
     '''
-        Atom class, defined by chemical element (atomic number), electric charge, and coordinates (numpy array).
+        Atom class, defined by chemical element (atomic number), electric charge, spin, and coordinates (numpy array).
     '''
     def __init__(self, element = 0, charge = 0.0, spin = 0.0, coordinates = np.array([0.0, 0.0, 0.0])):
         '''
@@ -52,8 +52,8 @@ class Atom(object):
     def element(self, value):
         if not isinstance(value,int):
             raise TypeError("Atomic element should be defined by their atomic number.")
-        elif ((value < 1) or (value > 118)):
-            raise Exception("Atomic number must be a integer number between 1 and 118.")
+        elif ((value < 0) or (value > 118)):
+            raise Exception("Atomic number must be a integer number between 0 and 118.")
         self.__element = value
 
     @property
@@ -105,6 +105,7 @@ class Chemical(Atom):
 
         df = pd.DataFrame()
         df['element'] = element
+        df['label'] = [element_tuple[atom] for atom in element ]
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
@@ -175,10 +176,10 @@ class Molecule(Chemical):
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
                 covalent_sum = covalent_radius[int(atom1['element'])]+covalent_radius[int(atom2['element'])]
                 if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
-                    bonds_topology.append([index1, index2, d])
+                    bonds_topology.append([index1, index2, df['label'].iloc[index1], df['label'].iloc[index2], d])
                     directions.append((np.array(atom1[['x', 'y', 'z']], dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
         
-        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1', 'index 2', 'distance'])
+        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1', 'index 2', 'label 1', 'label 2', 'distance'])
         bonds_df['direction'] = directions
         bonds_df.sort_values('distance', inplace = True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
@@ -189,8 +190,10 @@ class Molecule(Chemical):
         Return a data frame of angles between bonds of a molecule object.
         '''
         bonds_df = self.bonds(tolerance)
+        label_df = self.to_dataframe()['label']
         angles = []
         indeces = []
+        labels = []
         for index1, bond1 in bonds_df.iterrows():
             for index2, bond2 in bonds_df.iterrows():
                 union = set(bond1[['index 1', 'index 2']]).union(set(bond2[['index 1', 'index 2']]))
@@ -199,9 +202,12 @@ class Molecule(Chemical):
                     normalized_dotproduct = dotproduct/(np.linalg.norm(bond1['direction'])*np.linalg.norm(bond2['direction']))
                     angle = np.arccos(np.clip(normalized_dotproduct, -1, 1))*180/np.pi
                     angles.append(angle)
+                    labels.append([label_df.iloc[i] for i in list(union)])
                     indeces.append(list(union))
 
-        angles_df = pd.DataFrame(indeces, columns=['index 1', 'index 2', 'index 3'])
+        df1 = pd.DataFrame(indeces, columns = ['index 1', 'index 2', 'index 3'])
+        df2 = pd.DataFrame(labels, columns = ['label 1', 'label 2', 'label 3'])
+        angles_df = pd.concat([df1, df2], axis = 1)
         angles_df['angle'] = angles
         return angles_df
 
@@ -479,7 +485,7 @@ if __name__ == '__main__':
     molecule = Molecule()
     molecule.from_xyz("./test.xyz")
     print("Molecule dataframe")
-    print(molecule.move([0.0, 0.0, 5.0]).to_dataframe())
+    print(molecule.to_dataframe())
 
     print('\nBonds dataframe:')
     print(molecule.bonds(tolerance = 0.1))

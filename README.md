@@ -26,8 +26,20 @@ $ python setup.py install
 import numpy as np
 import ocelot as ocl
 
-carbon1 = ocl.Atom(element = 6, coordinates = [0.0, 0.0, 0.5])
-carbon2 = ocl.Atom(element = 6, coordinates = [1/3, 1/3, 0.5])
+# to build a methane molecule
+carbon1   = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [0.86380, 1.07246, 1.16831])
+hydrogen1 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [0.76957, 0.07016, 1.64057])
+hydrogen2 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [1.93983, 1.32622, 1.04881])
+hydrogen3 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [0.37285, 1.83372, 1.81325])
+hydrogen4 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [0.37294, 1.05973, 0.17061])
+
+methane = ocl.Molecule(atoms = [carbon1, hydrogen1, hydrogen2, hydrogen3, hydrogen4]
+                       charge = 0.0,
+                       spin = 0.0)
+
+# to build a graphene solid
+carbon1 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.0, 0.5])
+carbon2 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [1/3, 1/3, 0.5])
 
 graphene = ocl.Material(atoms = [carbon1, carbon2],
                         lattice_constant = 2.46,

@@ -27,7 +27,7 @@ from abc import ABCMeta, abstractmethod
 from collections import Counter
 import yaml
 import sys
-from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
+# from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
@@ -123,7 +123,7 @@ class Chemical(Atom):
 
     def save(self, filename):
         '''
-        Save object
+        Save object with pickle.
         '''
         import pickle
         with open(filename, "wb") as handle:
@@ -131,7 +131,7 @@ class Chemical(Atom):
 
     def load(self, filename):
         '''
-        Load object
+        Load object with pickle.
         '''
         import pickle
         with open(filename, "rb") as handle:
@@ -152,15 +152,21 @@ class Molecule(Chemical):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
     '''
-    def __init__(self, atoms = [Atom()], charge = 0.0, spin = 0.0, vacuum = 15.0, fixed = False):
+    def __init__(self, atoms = [Atom()], charge = None, spin = None, vacuum = 15.0, fixed = False):
         '''
         Molecule object constructor.
         '''
         self.__atoms = atoms
-        self.__charge = charge
-        self.__spin = spin
         self.__vacuum = vacuum
         self.__fixed = fixed
+        if charge == None:
+            self.__charge = sum([ atom.charge for atom in self.__atoms ])
+        else:
+            self.__charge = charge
+        if spin == None:
+            self.__spin = sum([ atom.spin for atom in self.__atoms ])
+        else:
+            self.__spin = spin
 
     @property
     def atoms(self):
@@ -520,12 +526,13 @@ class Operator(Planewave):
 # testing module core
 if __name__ == '__main__':
     from constants import element_tuple, atomic_number, covalent_radius
-    # atom1 = Atom(6, [0.86380, 1.07246, 1.16831])
-    # atom2 = Atom(1, [0.76957, 0.07016, 1.64057])
-    # atom3 = Atom(1, [1.93983, 1.32622, 1.04881])
-    # atom4 = Atom(1, [0.37285, 1.83372, 1.81325])
-    # atom5 = Atom(1, [0.37294, 1.05973, 0.17061])
-    #methane = Molecule([atom1, atom2, atom3, atom4, atom5])
+    atom1 = Atom(element = 6, charge =  1.00, coordinates = [0.86380, 1.07246, 1.16831])
+    atom2 = Atom(element = 1, charge = -0.25, coordinates = [0.76957, 0.07016, 1.64057])
+    atom3 = Atom(element = 1, charge = -0.25, coordinates = [1.93983, 1.32622, 1.04881])
+    atom4 = Atom(element = 1, charge = -0.25, coordinates = [0.37285, 1.83372, 1.81325])
+    atom5 = Atom(element = 1, charge = -0.25, coordinates = [0.37294, 1.05973, 0.17061])
+    methane = Molecule(atoms = [atom1, atom2, atom3, atom4, atom5])
+    print(methane.charge)
     #methane.write_xyz()
 
     # methane = Molecule()
@@ -543,11 +550,11 @@ if __name__ == '__main__':
     # print('\nMolecule box:')
     # print(methane.molecule_box())
 
-    molecule = Molecule()
-    molecule.from_xyz("./C150H30.xyz")
-    print("Molecule dataframe")
+    # molecule = Molecule()
+    # molecule.from_xyz("./C150H30.xyz")
+    # print("Molecule dataframe")
     #molecule = molecule.load("test.obj")
-    print(molecule.to_dataframe())
+    # print(molecule.to_dataframe())
 
     #print('\nBonds dataframe:')
     #print(molecule.bonds(tolerance = 0.1))

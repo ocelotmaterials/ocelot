@@ -21,6 +21,39 @@
   Module devices
 '''
 
-# import qiskit as qk
-# import cirq as cq
-# import pyquil as pq
+from abc import ABCMeta, abstractmethod
+
+class Device(object):
+  __metaclass__ = ABCMeta
+  def __init__(self):
+    pass
+
+
+class Qiskit(Device):
+  def __init__(self):
+    # import qiskit as qk
+    pass
+
+
+class Dwave(Device):
+  def __init__(self):
+    # import dwavebinarycsp
+    pass
+
+
+class Quil(Device):
+  def __init__(self):
+    # import pyquil as pq
+    pass
+
+
+class Cirq(Device):
+  def __init__(self):
+    # import cirq as cq
+    pass
+
+
+class Simulator(Device):
+  def __init__(self):
+    pass
+

@@ -33,15 +33,13 @@ hydrogen2 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [1.93983, 
 hydrogen3 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [0.37285, 1.83372, 1.81325])
 hydrogen4 = ocl.Atom(element = 1, charge = 0, spin = 0, coordinates = [0.37294, 1.05973, 0.17061])
 
-methane = ocl.Molecule(atoms = [carbon1, hydrogen1, hydrogen2, hydrogen3, hydrogen4]
-                       charge = 0.0,
-                       spin = 0.0)
+methane = ocl.Molecule(atoms = [carbon1, hydrogen1, hydrogen2, hydrogen3, hydrogen4])
 
 # to build a graphene sheet
 carbon1 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.0, 0.5])
 carbon2 = ocl.Atom(element = 6, charge = 0, spin = 0, coordinates = [1/3, 1/3, 0.5])
 
-graphene = ocl.Material(atoms = [carbon1, carbon2],
+graphene = ocl.Material(species = [carbon1, carbon2],
                         lattice_constant = 2.46,
                         bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
                                           [np.sqrt(3)/2,  1/2, 0.0],

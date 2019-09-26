@@ -121,6 +121,24 @@ class Chemical(Atom):
         df = self.to_dataframe()
         return [df['x'].max(), df['y'].max(), df['z'].max()]
 
+    def save(self, filename):
+        '''
+        Save object
+        '''
+        import pickle
+        with open(filename, "wb") as handle:
+           pickle.dump(self, handle)
+
+    def load(self, filename):
+        '''
+        Load object
+        '''
+        import pickle
+        with open(filename, "rb") as handle:
+            obj = pickle.load(handle)
+        
+        return obj
+
     @abstractmethod
     def from_xyz(self, filename):
         pass
@@ -134,7 +152,7 @@ class Molecule(Chemical):
     '''
     Molecule is defined by a list of atoms, charge and spin. 
     '''
-    def __init__(self, atoms = [Atom()], charge = 0.0, spin = 0.0, vacuum = 15.0):
+    def __init__(self, atoms = [Atom()], charge = 0.0, spin = 0.0, vacuum = 15.0, fixed = False):
         '''
         Molecule object constructor.
         '''
@@ -142,6 +160,7 @@ class Molecule(Chemical):
         self.__charge = charge
         self.__spin = spin
         self.__vacuum = vacuum
+        self.__fixed = fixed
 
     @property
     def atoms(self):
@@ -171,6 +190,14 @@ class Molecule(Chemical):
     def vacuum(self, value):
         self.__vacuum = value
 
+    @property
+    def fixed(self):
+        return self.__fixed
+
+    @fixed.setter
+    def fixed(self, value):
+        self.__fixed = value
+
     def bonds(self, tolerance = 0.1):
         '''
         Return a data frame with bonds among atoms of a molecule object.
@@ -193,9 +220,10 @@ class Molecule(Chemical):
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
 
-    def angles(self, tolerance = 0.1):
+    def wrong_angles(self, tolerance = 0.1):
         '''
         Return a data frame of angles between bonds of a molecule object.
+        Need corrections.
         '''
         bonds_df = self.bonds(tolerance)
         label_df = self.to_dataframe()['label']
@@ -223,7 +251,8 @@ class Molecule(Chemical):
         '''
         Return a data frame of dihedral (proper) angles of a molecule object.
         '''
-        angles_df = self.angles(tolerance)
+        pass
+        # angles_df = self.angles(tolerance)
         # TODO
 
     def improper(self):
@@ -247,12 +276,17 @@ class Molecule(Chemical):
         return new_molecule
 
     def rotate(self, angle = 0.0, vector = np.array([0.0, 0.0, 1.0])):
+        import copy
         from scipy.spatial.transform import Rotation
+        new_molecule = copy.deepcopy(self)
         rot = Rotation.from_rotvec(angle*vector)
         df = self.to_dataframe()
         matrix = np.array(df[['x', 'y', 'z']])
         new_matrix = np.matmul(matrix, rot)
-        # TODO
+        #df[['x', 'y', 'z']] = new_matrix
+        #for atom in new_molecule.atoms:
+        #    atom.coordinates = new_matrix[,:]
+        pass # TODO
 
     def join(self, molecule):
         pass # TODO
@@ -309,22 +343,22 @@ class Molecule(Chemical):
             print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
         # end of write_xyz() method
 
-class Material(Chemical):
+class Material(Molecule):
     '''
         Materials are defined by a list of atoms (object) and Bravais lattice vectors. 
     '''
-    def __init__(self, atoms, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
+    def __init__(self, species, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
         '''
         Material object constructor.
         '''
-        self.__atoms = atoms
+        self.__species = species
         self.__lattice_constant = lattice_constant
         self.__bravais_vector = bravais_vector
         self.__crystallographic = crystallographic
 
     @property
-    def atoms(self):
-        return self.__atoms
+    def species(self):
+        return self.__species
 
     @property
     def lattice_constant(self):
@@ -493,8 +527,8 @@ if __name__ == '__main__':
     molecule = Molecule()
     molecule.from_xyz("./C150H30.xyz")
     print("Molecule dataframe")
+    #molecule = molecule.load("test.obj")
     print(molecule.to_dataframe())
-    #print(molecule.min_coordinates())
 
     #print('\nBonds dataframe:')
     #print(molecule.bonds(tolerance = 0.1))

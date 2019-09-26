@@ -113,6 +113,14 @@ class Chemical(Atom):
         df = df.reset_index().drop(['index'], axis = 1)
         return df
 
+    def min_coordinates(self):
+        df = self.to_dataframe()
+        return [df['x'].min(), df['y'].min(), df['z'].min()]
+
+    def max_coordinates(self):
+        df = self.to_dataframe()
+        return [df['x'].max(), df['y'].max(), df['z'].max()]
+
     @abstractmethod
     def from_xyz(self, filename):
         pass
@@ -483,12 +491,13 @@ if __name__ == '__main__':
     # print(methane.molecule_box())
 
     molecule = Molecule()
-    molecule.from_xyz("./test.xyz")
+    molecule.from_xyz("./C150H30.xyz")
     print("Molecule dataframe")
     print(molecule.to_dataframe())
+    #print(molecule.min_coordinates())
 
-    print('\nBonds dataframe:')
-    print(molecule.bonds(tolerance = 0.1))
+    #print('\nBonds dataframe:')
+    #print(molecule.bonds(tolerance = 0.1))
 
     # print('\nAngles dataframe:')
     # print(molecule.angles(tolerance = 0.1))

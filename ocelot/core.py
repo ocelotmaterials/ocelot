@@ -94,7 +94,7 @@ class Chemical(Atom):
 
     def to_dataframe(self):
         '''
-        Convert a list of atoms in a pandas data frame.
+        Convert a list of atoms in a pandas dataframe.
         '''
         element = [ int(atom.element) for atom in self.atoms ]
         coordinates = [ atom.coordinates for atom in self.atoms ]
@@ -120,6 +120,28 @@ class Chemical(Atom):
     def max_coordinates(self):
         df = self.to_dataframe()
         return [df['x'].max(), df['y'].max(), df['z'].max()]
+
+    def move(self, vector = np.array([0.0, 0.0, 0.0])):
+        '''
+        Return a new object shifted by a vector.
+        '''
+        import copy
+        new_obj = copy.deepcopy(self)
+        for atom in new_obj.atoms:
+                atom.coordinates += vector
+        return new_obj
+
+    def rotate(self, seq = 'z', angles = 0.0, degrees = True):
+        '''
+        Return a new object rotated by Euler matrices with sequence "seq", and angles "angles".
+        '''
+        import copy
+        from scipy.spatial.transform import Rotation
+        new_obj = copy.deepcopy(self)
+        R = Rotation.from_euler(seq, angles, degrees)
+        for atom in new_obj.atoms:
+            atom.coordinates = R.apply(atom.coordinates)
+        return new_obj
 
     def save(self, filename):
         '''
@@ -227,6 +249,9 @@ class Molecule(Chemical):
         return bonds_df
 
     def nearest_neighbors_list(self, bonds = None):
+        '''
+        From each atom in the molecule object, return a list with nearest neighbors (atom) indeces.
+        '''
         if bonds:
             bonds_df = bonds
         else:
@@ -262,42 +287,15 @@ class Molecule(Chemical):
 
         return pd.DataFrame(nn_matrix)
 
-    def wrong_angles(self, tolerance = 0.1):
-        '''
-        Return a data frame of angles between bonds of a molecule object.
-        Need corrections.
-        '''
-        bonds_df = self.bonds(tolerance)
-        label_df = self.to_dataframe()['label']
-        angles = []
-        indeces = []
-        labels = []
-        for index1, bond1 in bonds_df.iterrows():
-            for index2, bond2 in bonds_df.iterrows():
-                union = set(bond1[['index 1', 'index 2']]).union(set(bond2[['index 1', 'index 2']]))
-                if len(union) == 3 and (index2 > index1):
-                    dotproduct = np.dot(bond1['direction'], bond2['direction'])
-                    normalized_dotproduct = dotproduct/(np.linalg.norm(bond1['direction'])*np.linalg.norm(bond2['direction']))
-                    angle = np.arccos(np.clip(normalized_dotproduct, -1, 1))*180/np.pi
-                    angles.append(angle)
-                    labels.append([label_df.iloc[i] for i in list(union)])
-                    indeces.append(list(union))
-
-        df1 = pd.DataFrame(indeces, columns = ['index 1', 'index 2', 'index 3'])
-        df2 = pd.DataFrame(labels, columns = ['label 1', 'label 2', 'label 3'])
-        angles_df = pd.concat([df1, df2], axis = 1)
-        angles_df['angle'] = angles
-        return angles_df
-
     def angles(self, tolerance = 0.1):
         '''
-        Return a data frame of angles of a molecule object.
+        Return a dataframe of angles of a molecule object.
         '''
         pass # TODO
 
     def dihedral_angles(self, tolerance = 0.1):
         '''
-        Return a data frame of dihedral (proper) angles of a molecule object.
+        Return a dataframe of dihedral (proper) angles of a molecule object.
         '''
         pass
         # angles_df = self.angles(tolerance)
@@ -325,21 +323,13 @@ class Molecule(Chemical):
         '''
         return np.diag(self.sizes()) + self.vacuum*np.eye(3)
 
-    def move(self, vector = np.array([0.0, 0.0, 0.0])):
-        import copy
-        new_molecule = copy.deepcopy(self)
-        for atom in new_molecule.atoms:
-                atom.coordinates += vector
-        return new_molecule
-
-    def rotate(self, angle = 0.0, vector = np.array([0.0, 0.0, 1.0])):
-        import copy
-        from scipy.spatial.transform import Rotation
-        new_molecule = copy.deepcopy(self)
-        rot = Rotation.from_rotvec(angle*(np.pi/180)*np.array(vector))
-        # use as: new_vector = rot.apply(vector)
-
-        # pass # TODO
+    def get_center(self):
+        '''
+        Return a vector with the center of the molecule coordinates.
+        '''
+        signs = self.min_coordinates()/(np.abs(self.min_coordinates()))
+        half_size = np.array(self.sizes())/2
+        return [half_size[x] - signs[x]*self.min_coordinates()[x] for x in range(3)]
 
     def join(self, molecule):
         pass # TODO
@@ -384,7 +374,6 @@ class Molecule(Chemical):
         '''
         Write xyz file of a Molecule object.
         '''
-        
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
@@ -565,14 +554,20 @@ if __name__ == '__main__':
 
     molecule = Molecule()
     molecule.from_xyz("./neopentane.xyz")
-    print("Molecule dataframe:")
-    print(molecule.to_dataframe())
+    molecule.write_xyz()
+    print(molecule.get_center())
+    # print("Molecule dataframe:")
+    # print(molecule.to_dataframe())
 
-    print('\nBonds dataframe:')
-    print(molecule.bonds(tolerance = 0.1))
+    # mol2 = molecule.rotate('z', angles = 90)
+    # mol2.write_xyz()
 
-    print("\nNearest neighbors list:")
-    print(molecule.nearest_neighbors_list())
+
+    # print('\nBonds dataframe:')
+    # print(molecule.bonds(tolerance = 0.1))
+
+    # print("\nNearest neighbors list:")
+    # print(molecule.nearest_neighbors_list())
 
     # print('\nAngles dataframe:')
     # print(methane.angles(tolerance = 0.1))

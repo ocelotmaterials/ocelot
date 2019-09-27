@@ -332,7 +332,8 @@ class Molecule(Chemical):
         return [half_size[x] - signs[x]*self.min_coordinates()[x] for x in range(3)]
 
     def join(self, molecule):
-        pass # TODO
+        for atom in molecule.atoms:
+            self.atoms.append(atom)
 
     def from_xyz(self, filename):
         '''
@@ -477,8 +478,11 @@ class Material(Chemical):
         if self.crystallographic:
             coordinates_block = self.to_dataframe()[['x', 'y', 'z']]
             print(coordinates_block.to_string(index = False, header = False))
-        #elif:
-            # TODO
+        else: # crystallographic False
+            coordinates_xyz = np.array(self.to_dataframe()[['x', 'y', 'z']])
+            coordinates_crystal = np.matmul(coordinates_xyz, np.linalg.inv(self.bravais_lattice))
+            coordinates_df = pd.DataFrame(coordinates_crystal)
+            print(coordinates_df.to_string(index = False, header = False))
 
     def reciprocal_lattice(self):
         return 2 * np.pi * np.linalg.inv(self.bravais_lattice).transpose()
@@ -541,27 +545,30 @@ if __name__ == '__main__':
     # print(methane.charge)
     #methane.write_xyz()
 
-    # carbon1 = Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.0, 0.5])
-    # carbon2 = Atom(element = 6, charge = 0, spin = 0, coordinates = [1/3, 1/3, 0.5])
+    # carbon1 = Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.00000, 10.0])
+    # carbon2 = Atom(element = 6, charge = 0, spin = 0, coordinates = [1.42028, 0.0000, 10.0])
     # graphene = Material(atoms = [carbon1, carbon2],
     #                     lattice_constant = 2.46,
     #                     bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
     #                                       [np.sqrt(3)/2,  1/2, 0.0],
     #                                       [0.0, 0.0, 20.0/2.46]],
-    #                     crystallographic = True)
-    #graphene.write_poscar()
+    #                     crystallographic = False)
+    # graphene.write_poscar()
     # print(graphene.to_dataframe())
 
     molecule = Molecule()
     molecule.from_xyz("./neopentane.xyz")
     molecule.write_xyz()
+    print("Molecule center:")
     print(molecule.get_center())
-    # print("Molecule dataframe:")
-    # print(molecule.to_dataframe())
+    print("Molecule dataframe:")
+    print(molecule.to_dataframe())
 
-    # mol2 = molecule.rotate('z', angles = 90)
+    # mol2 = molecule.rotate('z', angles = 90).move([0.0, 0.0, 5.0])
     # mol2.write_xyz()
+    # molecule.join(mol2)
 
+    # molecule.write_xyz()
 
     # print('\nBonds dataframe:')
     # print(molecule.bonds(tolerance = 0.1))

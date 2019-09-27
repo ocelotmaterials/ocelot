@@ -27,7 +27,7 @@ from abc import ABCMeta, abstractmethod
 from collections import Counter
 import yaml
 import sys
-# from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
+from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
@@ -206,7 +206,7 @@ class Molecule(Chemical):
 
     def bonds(self, tolerance = 0.1):
         '''
-        Return a data frame with bonds among atoms of a molecule object.
+        Return a dataframe with bonds among atoms of a molecule object.
         Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
         '''
         bonds_topology = []
@@ -225,6 +225,42 @@ class Molecule(Chemical):
         bonds_df.sort_values('distance', inplace = True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
+
+    def nearest_neighbors_list(self, bonds = None):
+        if bonds:
+            bonds_df = bonds
+        else:
+            bonds_df = self.bonds()
+
+        number_of_atoms = self.to_dataframe().shape[0]
+        nn_list = []
+        for atom_index in range(number_of_atoms):
+            nn_atom = []
+            for index, bond in bonds_df.iterrows():
+                if atom_index == bond['index 1']:
+                    nn_atom.append(bond['index 2'])
+                elif atom_index == bond['index 2']:
+                    nn_atom.append(bond['index 1'])
+
+            nn_list.append(nn_atom)
+        return nn_list
+
+    def nearest_neighbors_matrix(self, bonds = None):
+        '''
+        Return a N*N matrix (dataframe) with N = number of atoms.
+        The matrix element [i][j] is the bond distance if i and j are nearest neighbors, and 0 otherwise.
+        '''
+        if bonds:
+            bonds_df = bonds
+        else:
+            bonds_df = self.bonds()
+
+        number_of_atoms = self.to_dataframe().shape[0]
+        nn_matrix = np.zeros([number_of_atoms, number_of_atoms])
+        for index, bond in bonds_df.iterrows():
+            nn_matrix[bond['index 1']][bond['index 2']] = bond['distance']
+
+        return pd.DataFrame(nn_matrix)
 
     def wrong_angles(self, tolerance = 0.1):
         '''
@@ -273,15 +309,21 @@ class Molecule(Chemical):
         '''
         pass # TODO
 
-    def molecule_box(self):
+    def sizes(self):
         '''
-        Return a array with molecule dimensions plus vacuum spacing.
+        Return a array with molecule dimensions.
         '''
         df = self.to_dataframe()
         delta_x = df['x'].max() - df['x'].min()
         delta_y = df['y'].max() - df['y'].min()
         delta_z = df['z'].max() - df['z'].min()
-        return np.diag([delta_x, delta_y, delta_z])+self.vacuum*np.eye(3)
+        return [delta_x, delta_y, delta_z]
+
+    def molecule_box(self):
+        '''
+        Return a matrix with molecule dimensions plus vacuum spacing.
+        '''
+        return np.diag(self.sizes()) + self.vacuum*np.eye(3)
 
     def move(self, vector = np.array([0.0, 0.0, 0.0])):
         import copy
@@ -297,12 +339,6 @@ class Molecule(Chemical):
         rot = Rotation.from_rotvec(angle*(np.pi/180)*np.array(vector))
         # use as: new_vector = rot.apply(vector)
 
-        # df = self.to_dataframe()
-        # matrix = np.array(df[['x', 'y', 'z']])
-        # new_matrix = np.matmul(matrix, rot)
-        #df[['x', 'y', 'z']] = new_matrix
-        #for atom in new_molecule.atoms:
-        #    atom.coordinates = new_matrix[,:]
         # pass # TODO
 
     def join(self, molecule):
@@ -360,22 +396,22 @@ class Molecule(Chemical):
             print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
         # end of write_xyz() method
 
-class Material(Molecule):
+class Material(Chemical):
     '''
         Materials are defined by a list of atoms (object) and Bravais lattice vectors. 
     '''
-    def __init__(self, species, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
+    def __init__(self, atoms, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
         '''
         Material object constructor.
         '''
-        self.__species = species
+        self.__atoms = atoms
         self.__lattice_constant = lattice_constant
         self.__bravais_vector = bravais_vector
         self.__crystallographic = crystallographic
 
     @property
-    def species(self):
-        return self.__species
+    def atoms(self):
+        return self.__atoms
 
     @property
     def lattice_constant(self):
@@ -403,24 +439,6 @@ class Material(Molecule):
     def bravais_lattice(self):
         return np.array(self.__bravais_vector) * self.__lattice_constant
 
-    def write_yaml(self):
-        '''
-        Write an ocelot Materials object as a YAML file.
-        '''
-        cell = self.bravais_lattice
-        df = self.to_dataframe()
-        
-        print("cell:")
-        print("-  [{:.8f},  {:.8f},  {:.8f}]".format(cell[0][0], cell[0][1], cell[0][2]))
-        print("-  [{:.8f},  {:.8f},  {:.8f}]".format(cell[1][0], cell[1][1], cell[1][2]))
-        print("-  [{:.8f},  {:.8f},  {:.8f}]".format(cell[2][0], cell[2][1], cell[2][2]))
-        print("atoms:")
-        print(df.to_string(index = True, header = False))        
-
-    #def read_yaml(self,filename):
-    #    df = pd.read_yaml(sys.argv[1])
-    # TODO
-
     def write_xyz(self):
         '''
         Write xyz file of a Material object.
@@ -433,7 +451,7 @@ class Material(Molecule):
         
         df['label'] = label
         if self.crystallographic:
-            atoms_xyz = np.dot(np.array(df[['x', 'y', 'z']]), self.bravais_lattice)
+            atoms_xyz = np.matmul(np.array(df[['x', 'y', 'z']]), self.bravais_lattice.transpose())
             df['x_cart'] = atoms_xyz[:,0]
             df['y_cart'] = atoms_xyz[:,1]
             df['z_cart'] = atoms_xyz[:,2]
@@ -441,7 +459,6 @@ class Material(Molecule):
             for index, row in df.iterrows():
                 print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
         else:
-            atoms_xyz = np.array(df[['x', 'y', 'z']])
             df = df[['label', 'x', 'y', 'z']]
             for index, row in df.iterrows():
                 print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
@@ -526,22 +543,36 @@ class Operator(Planewave):
 # testing module core
 if __name__ == '__main__':
     from constants import element_tuple, atomic_number, covalent_radius
-    atom1 = Atom(element = 6, charge =  1.00, coordinates = [0.86380, 1.07246, 1.16831])
-    atom2 = Atom(element = 1, charge = -0.25, coordinates = [0.76957, 0.07016, 1.64057])
-    atom3 = Atom(element = 1, charge = -0.25, coordinates = [1.93983, 1.32622, 1.04881])
-    atom4 = Atom(element = 1, charge = -0.25, coordinates = [0.37285, 1.83372, 1.81325])
-    atom5 = Atom(element = 1, charge = -0.25, coordinates = [0.37294, 1.05973, 0.17061])
-    methane = Molecule(atoms = [atom1, atom2, atom3, atom4, atom5])
-    print(methane.charge)
+    # atom1 = Atom(element = 6, charge =  1.00, coordinates = [0.86380, 1.07246, 1.16831])
+    # atom2 = Atom(element = 1, charge = -0.25, coordinates = [0.76957, 0.07016, 1.64057])
+    # atom3 = Atom(element = 1, charge = -0.25, coordinates = [1.93983, 1.32622, 1.04881])
+    # atom4 = Atom(element = 1, charge = -0.25, coordinates = [0.37285, 1.83372, 1.81325])
+    # atom5 = Atom(element = 1, charge = -0.25, coordinates = [0.37294, 1.05973, 0.17061])
+    # methane = Molecule(atoms = [atom1, atom2, atom3, atom4, atom5])
+    # print(methane.charge)
     #methane.write_xyz()
 
-    # methane = Molecule()
-    # methane.from_xyz("./methane.xyz")
-    # print("Molecule dataframe:")
-    # print(methane.to_dataframe())
+    # carbon1 = Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.0, 0.5])
+    # carbon2 = Atom(element = 6, charge = 0, spin = 0, coordinates = [1/3, 1/3, 0.5])
+    # graphene = Material(atoms = [carbon1, carbon2],
+    #                     lattice_constant = 2.46,
+    #                     bravais_vector = [[np.sqrt(3)/2, -1/2, 0.0],
+    #                                       [np.sqrt(3)/2,  1/2, 0.0],
+    #                                       [0.0, 0.0, 20.0/2.46]],
+    #                     crystallographic = True)
+    #graphene.write_poscar()
+    # print(graphene.to_dataframe())
 
-    # print('\nBonds dataframe:')
-    # print(methane.bonds(tolerance = 0.1))
+    molecule = Molecule()
+    molecule.from_xyz("./neopentane.xyz")
+    print("Molecule dataframe:")
+    print(molecule.to_dataframe())
+
+    print('\nBonds dataframe:')
+    print(molecule.bonds(tolerance = 0.1))
+
+    print("\nNearest neighbors list:")
+    print(molecule.nearest_neighbors_list())
 
     # print('\nAngles dataframe:')
     # print(methane.angles(tolerance = 0.1))

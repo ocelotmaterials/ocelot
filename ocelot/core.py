@@ -27,7 +27,7 @@ from abc import ABCMeta, abstractmethod
 from collections import Counter
 import yaml
 import sys
-from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
+# from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
@@ -247,10 +247,18 @@ class Molecule(Chemical):
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
                 covalent_sum = covalent_radius[int(atom1['element'])]+covalent_radius[int(atom2['element'])]
                 if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
-                    bonds_topology.append([index1, index2, df['label'].iloc[index1], df['label'].iloc[index2], d])
+                    bonds_topology.append([index1,
+                                           index2,
+                                           df['label'].iloc[index1],
+                                           df['label'].iloc[index2],
+                                           d])
                     directions.append((np.array(atom1[['x', 'y', 'z']], dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
         
-        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1', 'index 2', 'label 1', 'label 2', 'distance'])
+        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1',
+                                                           'index 2',
+                                                           'label 1',
+                                                           'label 2',
+                                                           'distance'])
         bonds_df['direction'] = directions
         bonds_df.sort_values('distance', inplace = True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
@@ -318,15 +326,30 @@ class Molecule(Chemical):
         angles = []
         for ref_atom, bonds in nn_df.iterrows():
             new_bonds = bonds[bonds.notnull()]
-            if len(new_bonds) > 3:
+            if len(new_bonds) > 2:
                 for neighbor1 in new_bonds:
                     for neighbor2 in new_bonds:
                         if (neighbor1[0] > neighbor2[0]):
                             dot = np.dot(neighbor1[1], neighbor2[1])
+                            cross = np.cross(neighbor1[1], neighbor2[1])
                             angle = np.arccos(np.clip(-1, 1, dot))
-                            angles.append([ref_atom, neighbor1[0], neighbor2[0], df['label'].iloc[ref_atom], df['label'].iloc[neighbor1[0]], df['label'].iloc[neighbor2[0]], angle*180/np.pi])
+                            angles.append([ref_atom,
+                                           neighbor1[0],
+                                           neighbor2[0],
+                                           df['label'].iloc[ref_atom],
+                                           df['label'].iloc[neighbor1[0]],
+                                           df['label'].iloc[neighbor2[0]],
+                                           angle*180/np.pi,
+                                           cross/np.linalg.norm(cross)])
 
-        angles_df = pd.DataFrame(angles, columns = ['index 1', 'index 2', 'index 3', 'label 1', 'label 2', 'label 3', 'angle'])
+        angles_df = pd.DataFrame(angles, columns = ['index 1',
+                                                    'index 2',
+                                                    'index 3',
+                                                    'label 1',
+                                                    'label 2',
+                                                    'label 3',
+                                                    'angle',
+                                                    'normal'])
         return angles_df
 
     def dihedral_angles(self, tolerance = 0.1):
@@ -610,8 +633,9 @@ if __name__ == '__main__':
     # graphene.write_poscar()
     # print(graphene.to_dataframe())
 
+    filename = sys.argv[1]
     molecule = Molecule()
-    molecule.from_xyz("./ethane.xyz")
+    molecule.from_xyz(filename)
     # molecule.write_xyz()
     # print("Molecule center:")
     # print(molecule.get_center())

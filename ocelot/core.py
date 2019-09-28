@@ -18,7 +18,7 @@
 #   limitations under the License.
 
 '''
-  Module core 
+    Module core 
 '''
 
 import numpy as np
@@ -31,11 +31,19 @@ from .constants import element_tuple, atomic_number, covalent_radius # comment t
 
 class Atom(object):
     '''
-        Atom class, defined by chemical element (atomic number), electric charge, spin, and coordinates (numpy array).
+        Atom class, defined by chemical element (atomic number), charge, spin, and coordinates (numpy array).
+        Example 1:
+            To initialize a carbon atom (atomic number = 6) at coordinates = (1.0, 3.0, 5.0), use:
+            carbon1 = Atom(element = 6, coordinates = [1.0, 3.0, 5.0])
+        
+            Aditional attributes of atom objects are charge (by default = 0), and spin (by default = 0).
+        Example 2:
+            To initialize a chloride ion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
+            chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
     '''
     def __init__(self, element = 0, charge = 0.0, spin = 0.0, coordinates = np.array([0.0, 0.0, 0.0])):
         '''
-        Atom object constructor.
+            Atom object constructor.
         '''
         if ((element < 0) or (element > 118)): 
             raise Exception("Element should be defined by atomic number between 0 and 118.")
@@ -87,14 +95,14 @@ class Atom(object):
 
 class Chemical(Atom):
     '''
-    Abstract class to build Molecule and Material classes.
+        Abstract class to build both Molecule and Material classes.
     '''
 
     __metaclass__ = ABCMeta
 
     def to_dataframe(self):
         '''
-        Convert a list of atoms in a pandas dataframe.
+            Convert a list of atoms in a pandas dataframe.
         '''
         element = [ int(atom.element) for atom in self.atoms ]
         coordinates = [ atom.coordinates for atom in self.atoms ]
@@ -123,7 +131,7 @@ class Chemical(Atom):
 
     def move(self, vector = np.array([0.0, 0.0, 0.0])):
         '''
-        Return a new object shifted by a vector.
+            Return a new object shifted by a constant vector.
         '''
         import copy
         new_obj = copy.deepcopy(self)
@@ -133,7 +141,7 @@ class Chemical(Atom):
 
     def rotate(self, seq = 'z', angles = 0.0, degrees = True):
         '''
-        Return a new object rotated by Euler matrices with sequence "seq", and angles "angles".
+            Return a new object rotated by Euler matrices with sequence "seq", and angles "angles".
         '''
         import copy
         from scipy.spatial.transform import Rotation
@@ -145,7 +153,7 @@ class Chemical(Atom):
 
     def save(self, filename):
         '''
-        Save object with pickle.
+            Save object with pickle.
         '''
         import pickle
         with open(filename, "wb") as handle:
@@ -153,7 +161,7 @@ class Chemical(Atom):
 
     def load(self, filename):
         '''
-        Load object with pickle.
+            Load object with pickle.
         '''
         import pickle
         with open(filename, "rb") as handle:
@@ -172,11 +180,11 @@ class Chemical(Atom):
 
 class Molecule(Chemical):
     '''
-    Molecule is defined by a list of atoms, charge and spin. 
+        Molecule is defined by a list of atoms, charge and spin. 
     '''
     def __init__(self, atoms = [Atom()], charge = None, spin = None, vacuum = 15.0, fixed = False):
         '''
-        Molecule object constructor.
+            Molecule object constructor.
         '''
         self.__atoms = atoms
         self.__vacuum = vacuum
@@ -228,8 +236,8 @@ class Molecule(Chemical):
 
     def bonds(self, tolerance = 0.1):
         '''
-        Return a dataframe with bonds among atoms of a molecule object.
-        Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
+            Return a dataframe with bonds among atoms of a molecule object.
+            Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
         '''
         bonds_topology = []
         directions = []
@@ -250,7 +258,7 @@ class Molecule(Chemical):
 
     def nearest_neighbors_list(self, bonds = None):
         '''
-        From each atom in the molecule object, return a list with nearest neighbors (atom) indeces.
+            From each atom in the molecule object, return a list with nearest neighbors (atom) indeces.
         '''
         if bonds:
             bonds_df = bonds
@@ -272,8 +280,8 @@ class Molecule(Chemical):
 
     def nearest_neighbors_matrix(self, bonds = None):
         '''
-        Return a N*N matrix (dataframe) with N = number of atoms.
-        The matrix element [i][j] is the bond distance if i and j are nearest neighbors, and 0 otherwise.
+            Return a N*N matrix (dataframe) with N = number of atoms.
+            The matrix element [i][j] is the bond distance if i and j are nearest neighbors, and 0 otherwise.
         '''
         if bonds:
             bonds_df = bonds
@@ -289,13 +297,41 @@ class Molecule(Chemical):
 
     def angles(self, tolerance = 0.1):
         '''
-        Return a dataframe of angles of a molecule object.
+            Return a dataframe of angles of a molecule object.
         '''
-        pass # TODO
+        bonds_df = self.bonds(tolerance = tolerance)
+        df = self.to_dataframe()
+
+        number_of_atoms = df.shape[0]
+        nn_list = []
+        for atom_index in range(number_of_atoms):
+            nn_atom = []
+            for index, bond in bonds_df.iterrows():
+                if atom_index == bond['index 1']:
+                    nn_atom.append([bond['index 2'], np.array(bond['direction'])])
+                elif atom_index == bond['index 2']:
+                    nn_atom.append([bond['index 1'], -1*np.array(bond['direction']) ])
+            nn_list.append(nn_atom)
+
+        nn_df = pd.DataFrame(nn_list)
+
+        angles = []
+        for ref_atom, bonds in nn_df.iterrows():
+            new_bonds = bonds[bonds.notnull()]
+            if len(new_bonds) > 3:
+                for neighbor1 in new_bonds:
+                    for neighbor2 in new_bonds:
+                        if (neighbor1[0] > neighbor2[0]):
+                            dot = np.dot(neighbor1[1], neighbor2[1])
+                            angle = np.arccos(np.clip(-1, 1, dot))
+                            angles.append([ref_atom, neighbor1[0], neighbor2[0], df['label'].iloc[ref_atom], df['label'].iloc[neighbor1[0]], df['label'].iloc[neighbor2[0]], angle*180/np.pi])
+
+        angles_df = pd.DataFrame(angles, columns = ['index 1', 'index 2', 'index 3', 'label 1', 'label 2', 'label 3', 'angle'])
+        return angles_df
 
     def dihedral_angles(self, tolerance = 0.1):
         '''
-        Return a dataframe of dihedral (proper) angles of a molecule object.
+            Return a dataframe of dihedral (proper) angles of a molecule object.
         '''
         pass
         # angles_df = self.angles(tolerance)
@@ -303,13 +339,13 @@ class Molecule(Chemical):
 
     def improper_angles(self):
         '''
-        Return a data frame of improper torsion angles for a molecule object.
+            Return a data frame of improper torsion angles for a molecule object.
         '''
         pass # TODO
 
     def sizes(self):
         '''
-        Return a array with molecule dimensions.
+            Return a array with molecule dimensions.
         '''
         df = self.to_dataframe()
         delta_x = df['x'].max() - df['x'].min()
@@ -319,13 +355,13 @@ class Molecule(Chemical):
 
     def molecule_box(self):
         '''
-        Return a matrix with molecule dimensions plus vacuum spacing.
+            Return a matrix with molecule dimensions plus vacuum spacing.
         '''
         return np.diag(self.sizes()) + self.vacuum*np.eye(3)
 
     def get_center(self):
         '''
-        Return a vector with the center of the molecule coordinates.
+            Return a vector with the center of the molecule coordinates.
         '''
         signs = self.min_coordinates()/(np.abs(self.min_coordinates()))
         half_size = np.array(self.sizes())/2
@@ -337,10 +373,10 @@ class Molecule(Chemical):
 
     def from_xyz(self, filename):
         '''
-        Set molecule object with data from xyz file.
-        Usage:
-            molecule = Molecule()
-            molecule.from_xyz('./molecule.xyz')
+            Set molecule object with data from xyz file.
+            Usage:
+                molecule = Molecule()
+                molecule.from_xyz('./molecule.xyz')
         '''
         element = []
         coordinate_x = []
@@ -373,7 +409,7 @@ class Molecule(Chemical):
 
     def write_xyz(self):
         '''
-        Write xyz file of a Molecule object.
+            Write xyz file of a Molecule object.
         '''
         df = self.to_dataframe()
         print(df.shape[0])
@@ -392,7 +428,7 @@ class Material(Chemical):
     '''
     def __init__(self, atoms, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
         '''
-        Material object constructor.
+            Material object constructor.
         '''
         self.__atoms = atoms
         self.__lattice_constant = lattice_constant
@@ -428,10 +464,19 @@ class Material(Chemical):
     @property
     def bravais_lattice(self):
         return np.array(self.__bravais_vector) * self.__lattice_constant
+    
+    def from_molecule(self, molecule):
+        pass # TODO
+
+    def from_xyz(self, filename):
+        pass # TODO
+
+    def from_poscar(self, filename):
+        pass # TODO
 
     def write_xyz(self):
         '''
-        Write xyz file of a Material object.
+            Write xyz file of a Material object.
         '''
         
         df = self.to_dataframe()
@@ -455,7 +500,7 @@ class Material(Chemical):
 
     def write_poscar(self):
         '''
-        Write an ocelot Material object as a POSCAR file.
+            Write an ocelot Material object as a POSCAR file.
         '''
         bravais = self.bravais_vector
         print("POSCAR file generated by ocelot")
@@ -478,7 +523,7 @@ class Material(Chemical):
         if self.crystallographic:
             coordinates_block = self.to_dataframe()[['x', 'y', 'z']]
             print(coordinates_block.to_string(index = False, header = False))
-        else: # crystallographic False
+        else:
             coordinates_xyz = np.array(self.to_dataframe()[['x', 'y', 'z']])
             coordinates_crystal = np.matmul(coordinates_xyz, np.linalg.inv(self.bravais_lattice))
             coordinates_df = pd.DataFrame(coordinates_crystal)
@@ -497,12 +542,12 @@ class Material(Chemical):
 
 class KGrid(Material):
     '''
-    k points sample in Brillouin Zone for a Material object.
-    By default, using Monkhorst-Pack algorithm [Phys. Rev. B 13, 5188 (1976)].
+        k points sample in Brillouin Zone for a Material object.
+        By default, using Monkhorst-Pack algorithm [Phys. Rev. B 13, 5188 (1976)].
     '''
-    def __init__(self, matrix=np.eye(3), shift=np.array([0,0,0])):
+    def __init__(self, matrix = np.eye(3), shift = np.array([0,0,0])):
         '''
-        KGrid object constructor.
+            KGrid object constructor.
         '''
         self.__matrix = matrix
         self.__shift = shift
@@ -511,15 +556,15 @@ class KGrid(Material):
 
 class Planewave(KGrid):
     '''
-    Planewave class to span pediodic wave functions.
-    A planewave object is defined by a list of reciprocal lattice vectors [G_1, G_2, ...].
+        Planewave class to span pediodic wave functions.
+        A planewave object is defined by a list of reciprocal lattice vectors [G_1, G_2, ...].
 
-        \psi_{nk}(r) = \sum_{G}c_{n}(k+G)exp(i(k+G).r)
+            \psi_{nk}(r) = \sum_{G}c_{n}(k+G)exp(i(k+G).r)
 
     '''
     def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
         '''
-        Planewave object constructor.
+            Planewave object constructor.
         '''
         self.__energy_cutoff = energy_cutoff
         self.__energy_unit = energy_unit
@@ -527,10 +572,19 @@ class Planewave(KGrid):
 
 class Operator(Planewave):
     '''
-    Operator class in planewave basis
+        Operator class in planewave basis
     '''
     def __init__(self):
-        pass
+        pass # TODO
+
+    def kinetic_operator(self):
+        pass # TODO
+
+    def hartree_operator(self):
+        pass # TODO
+
+    def exchange_operator(self):
+        pass # TODO
 
 
 # testing module core
@@ -557,12 +611,18 @@ if __name__ == '__main__':
     # print(graphene.to_dataframe())
 
     molecule = Molecule()
-    molecule.from_xyz("./neopentane.xyz")
-    molecule.write_xyz()
-    print("Molecule center:")
-    print(molecule.get_center())
+    molecule.from_xyz("./ethane.xyz")
+    # molecule.write_xyz()
+    # print("Molecule center:")
+    # print(molecule.get_center())
     print("Molecule dataframe:")
     print(molecule.to_dataframe())
+
+    print("Molecule bonds:")
+    print(molecule.bonds())
+
+    print("Molecule angles:")
+    print(molecule.angles())
 
     # mol2 = molecule.rotate('z', angles = 90).move([0.0, 0.0, 5.0])
     # mol2.write_xyz()

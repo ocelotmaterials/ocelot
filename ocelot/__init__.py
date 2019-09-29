@@ -18,9 +18,12 @@
 #   limitations under the License.
 
 from .core import *
-#from .algorithms import *
+#from .wavefunction import *
 #from .potentials import *
 #from .molecular import *
 #from .devices import *
+#from .montecarlo import *
+#from .magnetism import *
+#from .visualization import *
 
 __version__ = "0.0.5"

@@ -32,13 +32,15 @@ import sys
 class Atom(object):
     '''
         Atom class, defined by chemical element (atomic number), charge, spin, and coordinates (numpy array).
+
         Example 1:
             To initialize a carbon atom (atomic number = 6) at coordinates = (1.0, 3.0, 5.0), use:
             carbon1 = Atom(element = 6, coordinates = [1.0, 3.0, 5.0])
         
             Aditional attributes of atom objects are charge (by default = 0), and spin (by default = 0).
+
         Example 2:
-            To initialize a chloride ion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
+            To initialize a chloride anion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
             chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
     '''
     def __init__(self, element = 0, charge = 0.0, spin = 0.0, coordinates = np.array([0.0, 0.0, 0.0])):
@@ -233,7 +235,7 @@ class Molecule(Chemical):
     @fixed.setter
     def fixed(self, value):
         self.__fixed = value
-
+    
     def bonds(self, tolerance = 0.1):
         '''
             Return a dataframe with bonds among atoms of a molecule object.
@@ -242,6 +244,7 @@ class Molecule(Chemical):
         bonds_topology = []
         directions = []
         df = self.to_dataframe()
+
         for index1, atom1 in df.iterrows():
             for index2, atom2 in df.iterrows():
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
@@ -302,7 +305,7 @@ class Molecule(Chemical):
             nn_matrix[bond['index 1']][bond['index 2']] = bond['distance']
 
         return pd.DataFrame(nn_matrix)
-
+    
     def angles(self, tolerance = 0.1):
         '''
             Return a dataframe of angles of a molecule object.
@@ -312,6 +315,7 @@ class Molecule(Chemical):
 
         number_of_atoms = df.shape[0]
         nn_list = []
+
         for atom_index in range(number_of_atoms):
             nn_atom = []
             for index, bond in bonds_df.iterrows():
@@ -548,6 +552,7 @@ class Material(Chemical):
             print(coordinates_block.to_string(index = False, header = False))
         else:
             coordinates_xyz = np.array(self.to_dataframe()[['x', 'y', 'z']])
+            # REFACTORING
             coordinates_crystal = np.matmul(coordinates_xyz, np.linalg.inv(self.bravais_lattice))
             coordinates_df = pd.DataFrame(coordinates_crystal)
             print(coordinates_df.to_string(index = False, header = False))
@@ -558,56 +563,6 @@ class Material(Chemical):
     def supercell_lattice(self,matrix = np.eye(3)):
         self.__matrix = np.array(matrix)
         return self.bravais_lattice * self.__matrix
-
-
-# class ReciprocalLattice(object):
-# class Supercell(object):
-
-class KGrid(Material):
-    '''
-        k points sample in Brillouin Zone for a Material object.
-        By default, using Monkhorst-Pack algorithm [Phys. Rev. B 13, 5188 (1976)].
-    '''
-    def __init__(self, matrix = np.eye(3), shift = np.array([0,0,0])):
-        '''
-            KGrid object constructor.
-        '''
-        self.__matrix = matrix
-        self.__shift = shift
-        self.__supercell = self.bravais_lattice*self.__matrix
-
-
-class Planewave(KGrid):
-    '''
-        Planewave class to span pediodic wave functions.
-        A planewave object is defined by a list of reciprocal lattice vectors [G_1, G_2, ...].
-
-            \psi_{nk}(r) = \sum_{G}c_{n}(k+G)exp(i(k+G).r)
-
-    '''
-    def __init__(self, energy_cutoff = 20, energy_unit = "Ha"):
-        '''
-            Planewave object constructor.
-        '''
-        self.__energy_cutoff = energy_cutoff
-        self.__energy_unit = energy_unit
-
-
-class Operator(Planewave):
-    '''
-        Operator class in planewave basis
-    '''
-    def __init__(self):
-        pass # TODO
-
-    def kinetic_operator(self):
-        pass # TODO
-
-    def hartree_operator(self):
-        pass # TODO
-
-    def exchange_operator(self):
-        pass # TODO
 
 
 # testing module core

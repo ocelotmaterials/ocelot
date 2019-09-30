@@ -236,7 +236,7 @@ class Molecule(Chemical):
     def fixed(self, value):
         self.__fixed = value
     
-    def bonds(self, tolerance = 0.1):
+    def bonds(self, tolerance = 0.2):
         '''
             Return a dataframe with bonds among atoms of a molecule object.
             Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
@@ -306,7 +306,7 @@ class Molecule(Chemical):
 
         return pd.DataFrame(nn_matrix)
     
-    def angles(self, tolerance = 0.1):
+    def angles(self, tolerance = 0.2):
         '''
             Return a dataframe of angles of a molecule object.
         '''
@@ -356,15 +356,19 @@ class Molecule(Chemical):
                                                     'normal'])
         return angles_df
 
-    def dihedral_angles(self, tolerance = 0.1):
+    def dihedral_angles(self, tolerance = 0.2):
         '''
             Return a dataframe of dihedral (proper) angles of a molecule object.
         '''
-        pass
-        # angles_df = self.angles(tolerance)
+        angles_df = self.angles(tolerance)
+        df = self.to_dataframe()
+        # for index1, angle1 in angles_df.iterrows():
+        #     for index2, angle2 in angles_df.iterrows():
+                # angle1['normal'] * angle2['normal']
+
         # TODO
 
-    def improper_angles(self):
+    def improper_angles(self, tolerance = 0.2):
         '''
             Return a data frame of improper torsion angles for a molecule object.
         '''

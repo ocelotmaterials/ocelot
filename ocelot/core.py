@@ -27,7 +27,7 @@ from abc import ABCMeta, abstractmethod
 from collections import Counter
 import yaml
 import sys
-# from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
+from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
@@ -595,7 +595,8 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     molecule = Molecule()
     molecule.from_xyz(filename)
-    # molecule2= molecule.move([-1.41178331, 1.06440733, 0.0])
+    # print(molecule.min_coordinates())
+    # molecule2= molecule.move([6.19524, -0.5353, 1.68151])
     # molecule2.write_xyz()
     # print("Molecule center:")
     # print(molecule.get_center())
@@ -605,8 +606,8 @@ if __name__ == '__main__':
     print("Molecule bonds:")
     print(molecule.bonds())
 
-    print("Molecule angles:")
-    print(molecule.angles())
+    # print("Molecule angles:")
+    # print(molecule.angles())
 
     # mol2 = molecule.rotate('z', angles = 90).move([0.0, 0.0, 5.0])
     # mol2.write_xyz()

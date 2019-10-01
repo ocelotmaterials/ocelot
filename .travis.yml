@@ -5,6 +5,6 @@ python:
   - "3.7"
   - "3.8-dev"
 install:
-  - pip install -r requirements.txt
-  - pip install ocelot-quantum
+  - python -m pip install -r requirements.txt
+  - python -m pip install ocelot-quantum
 script: pytest

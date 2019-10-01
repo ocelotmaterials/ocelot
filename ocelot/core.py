@@ -18,7 +18,7 @@
 #   limitations under the License.
 
 '''
-    Module core 
+Module core 
 '''
 
 from abc import ABCMeta, abstractmethod
@@ -30,26 +30,27 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 import pandas as pd
 # import yaml
-from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
+from .constants import element_tuple, atomic_number, covalent_radius  # comment this line to test
+
 
 class Atom(object):
     '''
-        Atom class, defined by chemical element (atomic number), charge, spin,
-        and coordinates (numpy array).
+    Atom class, defined by chemical element (atomic number), charge, spin,
+    and coordinates (numpy array).
 
-        Example 1:
-            To initialize a carbon atom (atomic number = 6) at coordinates = (1.0, 3.0, 5.0), use:
-            carbon1 = Atom(element = 6, coordinates = [1.0, 3.0, 5.0])
-        
-            Aditional attributes of atom objects are charge (by default = 0), and spin (by default = 0).
+    Example 1:
+        To initialize a carbon atom (atomic number = 6) at coordinates = (1.0, 3.0, 5.0), use:
+        carbon1 = Atom(element = 6, coordinates = [1.0, 3.0, 5.0])
 
-        Example 2:
-            To initialize a chloride anion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
-            chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
+        Aditional attributes of atom objects are charge (by default = 0), and spin (by default = 0).
+
+    Example 2:
+        To initialize a chloride anion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
+        chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
     '''
     def __init__(self, element=0, charge=0.0, spin=0.0, coordinates=np.array([0.0, 0.0, 0.0])):
         '''
-            Atom object constructor.
+        Atom object constructor.
         '''
         if ((element < 0) or (element > 118)): 
             raise Exception("Element should be defined by atomic number between 0 and 118.")
@@ -64,7 +65,7 @@ class Atom(object):
 
     @element.setter
     def element(self, value):
-        if not isinstance(value,int):
+        if not isinstance(value, int):
             raise TypeError("Atomic element should be defined by their atomic number.")
         elif ((value < 0) or (value > 118)):
             raise Exception("Atomic number must be a integer number between 0 and 118.")
@@ -92,7 +93,7 @@ class Atom(object):
 
     @coordinates.setter
     def coordinates(self, values):
-        if not (isinstance(values,list) or isinstance(values,np.ndarray)):
+        if not (isinstance(values, list) or isinstance(values, np.ndarray)):
             raise TypeError("Coordinates should by type list or numpy array (np.ndarray).")
         elif len(values) != 3:
             raise Exception("Coordinates must be 3 values in a list or numpy array.")
@@ -113,9 +114,9 @@ class Chemical(Atom):
         element = [int(atom.element) for atom in self.atoms]
         coordinates = [atom.coordinates for atom in self.atoms]
 
-        coordinate_x = np.array(coordinates)[:,0]
-        coordinate_y = np.array(coordinates)[:,1]
-        coordinate_z = np.array(coordinates)[:,2]
+        coordinate_x = np.array(coordinates)[:, 0]
+        coordinate_y = np.array(coordinates)[:, 1]
+        coordinate_z = np.array(coordinates)[:, 2]
 
         df = pd.DataFrame()
         df['element'] = element
@@ -123,8 +124,8 @@ class Chemical(Atom):
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
-        df.sort_values('element', inplace = True)
-        df = df.reset_index().drop(['index'], axis = 1)
+        df.sort_values('element', inplace=True)
+        df = df.reset_index().drop(['index'], axis=1)
         return df
 
     def min_coordinates(self):
@@ -135,13 +136,13 @@ class Chemical(Atom):
         df = self.to_dataframe()
         return [df['x'].max(), df['y'].max(), df['z'].max()]
 
-    def move(self, vector = np.array([0.0, 0.0, 0.0])):
+    def move(self, vector=np.array([0.0, 0.0, 0.0])):
         '''
             Return a new object shifted by a constant vector.
         '''
         new_obj = deepcopy(self)
         for atom in new_obj.atoms:
-                atom.coordinates += vector
+            atom.coordinates += vector
         return new_obj
 
     def rotate(self, seq='z', angles=0.0, degrees=True):
@@ -159,7 +160,7 @@ class Chemical(Atom):
             Save object with pickle.
         '''
         with open(filename, "wb") as handle:
-           dump(self, handle)
+            dump(self, handle)
 
     def load(self, filename):
         '''
@@ -167,7 +168,7 @@ class Chemical(Atom):
         '''
         with open(filename, "rb") as handle:
             obj = load(handle)
-        
+
         return obj
 
     @abstractmethod
@@ -190,11 +191,11 @@ class Molecule(Chemical):
         self.__atoms = atoms
         self.__vacuum = vacuum
         self.__fixed = fixed
-        if charge == None:
+        if charge is None:
             self.__charge = sum([atom.charge for atom in self.__atoms])
         else:
             self.__charge = charge
-        if spin == None:
+        if spin is None:
             self.__spin = sum([atom.spin for atom in self.__atoms])
         else:
             self.__spin = spin
@@ -206,7 +207,7 @@ class Molecule(Chemical):
     @property
     def charge(self):
         return self.__charge
-    
+
     @charge.setter
     def charge(self, value):
         self.__charge = value
@@ -234,7 +235,7 @@ class Molecule(Chemical):
     @fixed.setter
     def fixed(self, value):
         self.__fixed = value
-    
+
     def bonds(self, tolerance=0.2):
         '''
             Return a dataframe with bonds among atoms of a molecule object.
@@ -247,25 +248,27 @@ class Molecule(Chemical):
         for index1, atom1 in df.iterrows():
             for index2, atom2 in df.iterrows():
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
-                covalent_sum = covalent_radius[int(atom1['element'])]+ \
-                    covalent_radius[int(atom2['element'])]
+                covalent_sum = covalent_radius[int(atom1['element'])] + covalent_radius[int(atom2['element'])]
                 if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
-                    bonds_topology.append([index1,
-                                           index2,
-                                           df['label'].iloc[index1],
-                                           df['label'].iloc[index2],
-                                           d])
-                    directions.append((np.array(atom1[['x', 'y', 'z']], \
-                        dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
-        
-        bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1',
-                                                           'index 2',
-                                                           'label 1',
-                                                           'label 2',
-                                                           'distance'])
+                    bonds_topology.append([
+                        index1,
+                        index2,
+                        df['label'].iloc[index1],
+                        df['label'].iloc[index2],
+                        d])
+                    directions.append(
+                        (np.array(atom1[['x', 'y', 'z']], dtype=np.float32)
+                        - np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
+
+        bonds_df = pd.DataFrame(bonds_topology, columns=[
+            'index 1',
+            'index 2',
+            'label 1',
+            'label 2',
+            'distance'])
         bonds_df['direction'] = directions
-        bonds_df.sort_values('distance', inplace = True)
-        bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
+        bonds_df.sort_values('distance', inplace=True)
+        bonds_df = bonds_df.reset_index().drop(['index'], axis=1)
         return bonds_df
 
     def nearest_neighbors_list(self, bonds=None):
@@ -307,7 +310,7 @@ class Molecule(Chemical):
             nn_matrix[bond['index 1']][bond['index 2']] = bond['distance']
 
         return pd.DataFrame(nn_matrix)
-    
+
     def angles(self, tolerance=0.2):
         '''
             Return a dataframe of angles of a molecule object.
@@ -324,7 +327,7 @@ class Molecule(Chemical):
                 if atom_index == bond['index 1']:
                     nn_atom.append([bond['index 2'], np.array(bond['direction'])])
                 elif atom_index == bond['index 2']:
-                    nn_atom.append([bond['index 1'], -1*np.array(bond['direction']) ])
+                    nn_atom.append([bond['index 1'], -1*np.array(bond['direction'])])
             nn_list.append(nn_atom)
 
         nn_df = pd.DataFrame(nn_list)
@@ -339,23 +342,25 @@ class Molecule(Chemical):
                             dot = np.dot(neighbor1[1], neighbor2[1])
                             cross = np.cross(neighbor1[1], neighbor2[1])
                             angle = np.arccos(np.clip(-1, 1, dot))
-                            angles.append([ref_atom,
-                                           neighbor1[0],
-                                           neighbor2[0],
-                                           df['label'].iloc[ref_atom],
-                                           df['label'].iloc[neighbor1[0]],
-                                           df['label'].iloc[neighbor2[0]],
-                                           angle*180/np.pi,
-                                           cross/np.linalg.norm(cross)])
+                            angles.append([
+                                ref_atom,
+                                neighbor1[0],
+                                neighbor2[0],
+                                df['label'].iloc[ref_atom],
+                                df['label'].iloc[neighbor1[0]],
+                                df['label'].iloc[neighbor2[0]],
+                                angle*180/np.pi,
+                                cross/np.linalg.norm(cross)])
 
-        angles_df = pd.DataFrame(angles, columns = ['index 1',
-                                                    'index 2',
-                                                    'index 3',
-                                                    'label 1',
-                                                    'label 2',
-                                                    'label 3',
-                                                    'angle',
-                                                    'normal'])
+        angles_df = pd.DataFrame(angles, columns=[
+            'index 1',
+            'index 2',
+            'index 3',
+            'label 1',
+            'label 2',
+            'label 3',
+            'angle',
+            'normal'])
         return angles_df
 
     def dihedral_angles(self, tolerance=0.2):
@@ -366,7 +371,7 @@ class Molecule(Chemical):
         df = self.to_dataframe()
         # for index1, angle1 in angles_df.iterrows():
         #     for index2, angle2 in angles_df.iterrows():
-                # angle1['normal'] * angle2['normal']
+        # angle1['normal'] * angle2['normal']
 
         # TODO
 
@@ -374,7 +379,7 @@ class Molecule(Chemical):
         '''
             Return a data frame of improper torsion angles for a molecule object.
         '''
-        pass # TODO
+        pass  # TODO
 
     def sizes(self):
         '''
@@ -415,7 +420,7 @@ class Molecule(Chemical):
         coordinate_x = []
         coordinate_y = []
         coordinate_z = []
-        with open(filename, 'r', encoding = "utf-8") as stream:
+        with open(filename, 'r', encoding="utf-8") as stream:
             number_of_atoms = int(stream.readline())
             comment = stream.readline()
             for index in range(number_of_atoms):
@@ -434,7 +439,9 @@ class Molecule(Chemical):
 
         atoms_list = []
         for index, row in df.iterrows():
-            atom = Atom(element = row['element'], coordinates = np.array(row[['x', 'y', 'z']]))
+            atom = Atom(
+                element=row['element'],
+                coordinates=np.array(row[['x', 'y', 'z']]))
             atoms_list.append(atom)
 
         self.__atoms = atoms_list
@@ -448,12 +455,13 @@ class Molecule(Chemical):
         print(df.shape[0])
         print("  ")   
         label = [element_tuple[int(atom)] for atom in list(df['element'])]
-        
+
         df['label'] = label
         df = df[['label', 'x', 'y', 'z']]
         for index, row in df.iterrows():
             print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))     
         # end of write_xyz() method
+
 
 class Material(Chemical):
     '''
@@ -497,32 +505,31 @@ class Material(Chemical):
     @property
     def bravais_lattice(self):
         return np.array(self.__bravais_vector) * self.__lattice_constant
-    
+
     def from_molecule(self, molecule):
-        pass # TODO
+        pass  # TODO
 
     def from_xyz(self, filename):
-        pass # TODO
+        pass  # TODO
 
     def from_poscar(self, filename):
-        pass # TODO
+        pass  # TODO
 
     def write_xyz(self):
         '''
             Write xyz file of a Material object.
         '''
-        
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
         label = [element_tuple[atom] for atom in list(df['element'])]
-        
+
         df['label'] = label
         if self.crystallographic:
             atoms_xyz = np.matmul(np.array(df[['x', 'y', 'z']]), self.bravais_lattice.transpose())
-            df['x_cart'] = atoms_xyz[:,0]
-            df['y_cart'] = atoms_xyz[:,1]
-            df['z_cart'] = atoms_xyz[:,2]
+            df['x_cart'] = atoms_xyz[:, 0]
+            df['y_cart'] = atoms_xyz[:, 1]
+            df['z_cart'] = atoms_xyz[:, 2]
             df = df[['label', 'x_cart', 'y_cart', 'z_cart']]
             for index, row in df.iterrows():
                 print("{}  {:.8f}  {:.8f}  {:.8f}".format(row[0], row[1], row[2], row[3]))
@@ -541,32 +548,32 @@ class Material(Chemical):
         print("    {:.8f}  {:.8f}  {:.8f}".format(bravais[0][0], bravais[0][1], bravais[0][2]))
         print("    {:.8f}  {:.8f}  {:.8f}".format(bravais[1][0], bravais[1][1], bravais[1][2]))
         print("    {:.8f}  {:.8f}  {:.8f}".format(bravais[2][0], bravais[2][1], bravais[2][2]))
-        
+
         element = self.to_dataframe()['element']
         unique_atoms = Counter(element)
-        print("   ", end = " ")
+        print("   ", end=" ")
         for unique_atom in unique_atoms:
-            print(element_tuple[unique_atom], end = " ")
+            print(element_tuple[unique_atom], end=" ")
 
-        print("\n   ", end = " ")
+        print("\n   ", end=" ")
         for unique_atom in unique_atoms:
-            print(unique_atoms[unique_atom], end = "  ")
+            print(unique_atoms[unique_atom], end="  ")
 
         print("\nDirect")
         if self.crystallographic:
             coordinates_block = self.to_dataframe()[['x', 'y', 'z']]
-            print(coordinates_block.to_string(index = False, header = False))
+            print(coordinates_block.to_string(index=False, header=False))
         else:
             coordinates_xyz = np.array(self.to_dataframe()[['x', 'y', 'z']])
             # REFACTORING
             coordinates_crystal = np.matmul(coordinates_xyz, np.linalg.inv(self.bravais_lattice))
             coordinates_df = pd.DataFrame(coordinates_crystal)
-            print(coordinates_df.to_string(index = False, header = False))
+            print(coordinates_df.to_string(index=False, header=False))
 
     def reciprocal_lattice(self):
         return 2 * np.pi * np.linalg.inv(self.bravais_lattice).transpose()
-    
-    def supercell_lattice(self,matrix = np.eye(3)):
+
+    def supercell_lattice(self, matrix=np.eye(3)):
         self.__matrix = np.array(matrix)
         return self.bravais_lattice * self.__matrix
 
@@ -581,7 +588,7 @@ if __name__ == '__main__':
     # atom5 = Atom(element = 1, charge = -0.25, coordinates = [0.37294, 1.05973, 0.17061])
     # methane = Molecule(atoms = [atom1, atom2, atom3, atom4, atom5])
     # print(methane.charge)
-    #methane.write_xyz()
+    # methane.write_xyz()
 
     # carbon1 = Atom(element = 6, charge = 0, spin = 0, coordinates = [0.0, 0.00000, 10.0])
     # carbon2 = Atom(element = 6, charge = 0, spin = 0, coordinates = [1.42028, 0.0000, 10.0])
@@ -626,19 +633,18 @@ if __name__ == '__main__':
     # print('\nAngles dataframe:')
     # print(methane.angles(tolerance = 0.1))
 
-    #methane.angles().to_csv('angles.csv', encoding='utf-8', index=False)
+    # methane.angles().to_csv('angles.csv', encoding='utf-8', index=False)
     # print('\nMolecule box:')
     # print(methane.molecule_box())
 
     # molecule = Molecule()
     # molecule.from_xyz("./C150H30.xyz")
     # print("Molecule dataframe")
-    #molecule = molecule.load("test.obj")
+    # molecule = molecule.load("test.obj")
     # print(molecule.to_dataframe())
 
-    #print('\nBonds dataframe:')
-    #print(molecule.bonds(tolerance = 0.1))
+    # print('\nBonds dataframe:')
+    # print(molecule.bonds(tolerance = 0.1))
 
     # print('\nAngles dataframe:')
     # print(molecule.angles(tolerance = 0.1))
-

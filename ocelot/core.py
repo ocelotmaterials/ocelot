@@ -21,17 +21,21 @@
     Module core 
 '''
 
-import numpy as np
-import pandas as pd
 from abc import ABCMeta, abstractmethod
 from collections import Counter
-import yaml
-import sys
+from copy import deepcopy
+from pickle import dump, load
+from sys import argv
+from scipy.spatial.transform import Rotation
+import numpy as np
+import pandas as pd
+# import yaml
 from .constants import element_tuple, atomic_number, covalent_radius # comment this line to test
 
 class Atom(object):
     '''
-        Atom class, defined by chemical element (atomic number), charge, spin, and coordinates (numpy array).
+        Atom class, defined by chemical element (atomic number), charge, spin,
+        and coordinates (numpy array).
 
         Example 1:
             To initialize a carbon atom (atomic number = 6) at coordinates = (1.0, 3.0, 5.0), use:
@@ -43,7 +47,7 @@ class Atom(object):
             To initialize a chloride anion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
             chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
     '''
-    def __init__(self, element = 0, charge = 0.0, spin = 0.0, coordinates = np.array([0.0, 0.0, 0.0])):
+    def __init__(self, element=0, charge=0.0, spin=0.0, coordinates=np.array([0.0, 0.0, 0.0])):
         '''
             Atom object constructor.
         '''
@@ -106,8 +110,8 @@ class Chemical(Atom):
         '''
             Convert a list of atoms in a pandas dataframe.
         '''
-        element = [ int(atom.element) for atom in self.atoms ]
-        coordinates = [ atom.coordinates for atom in self.atoms ]
+        element = [int(atom.element) for atom in self.atoms]
+        coordinates = [atom.coordinates for atom in self.atoms]
 
         coordinate_x = np.array(coordinates)[:,0]
         coordinate_y = np.array(coordinates)[:,1]
@@ -115,7 +119,7 @@ class Chemical(Atom):
 
         df = pd.DataFrame()
         df['element'] = element
-        df['label'] = [element_tuple[atom] for atom in element ]
+        df['label'] = [element_tuple[atom] for atom in element]
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
@@ -135,19 +139,16 @@ class Chemical(Atom):
         '''
             Return a new object shifted by a constant vector.
         '''
-        import copy
-        new_obj = copy.deepcopy(self)
+        new_obj = deepcopy(self)
         for atom in new_obj.atoms:
                 atom.coordinates += vector
         return new_obj
 
-    def rotate(self, seq = 'z', angles = 0.0, degrees = True):
+    def rotate(self, seq='z', angles=0.0, degrees=True):
         '''
             Return a new object rotated by Euler matrices with sequence "seq", and angles "angles".
         '''
-        import copy
-        from scipy.spatial.transform import Rotation
-        new_obj = copy.deepcopy(self)
+        new_obj = deepcopy(self)
         R = Rotation.from_euler(seq, angles, degrees)
         for atom in new_obj.atoms:
             atom.coordinates = R.apply(atom.coordinates)
@@ -157,17 +158,15 @@ class Chemical(Atom):
         '''
             Save object with pickle.
         '''
-        import pickle
         with open(filename, "wb") as handle:
-           pickle.dump(self, handle)
+           dump(self, handle)
 
     def load(self, filename):
         '''
             Load object with pickle.
         '''
-        import pickle
         with open(filename, "rb") as handle:
-            obj = pickle.load(handle)
+            obj = load(handle)
         
         return obj
 
@@ -184,7 +183,7 @@ class Molecule(Chemical):
     '''
         Molecule is defined by a list of atoms, charge and spin. 
     '''
-    def __init__(self, atoms = [Atom()], charge = None, spin = None, vacuum = 15.0, fixed = False):
+    def __init__(self, atoms=[Atom()], charge=None, spin=None, vacuum=15.0, fixed=False):
         '''
             Molecule object constructor.
         '''
@@ -192,11 +191,11 @@ class Molecule(Chemical):
         self.__vacuum = vacuum
         self.__fixed = fixed
         if charge == None:
-            self.__charge = sum([ atom.charge for atom in self.__atoms ])
+            self.__charge = sum([atom.charge for atom in self.__atoms])
         else:
             self.__charge = charge
         if spin == None:
-            self.__spin = sum([ atom.spin for atom in self.__atoms ])
+            self.__spin = sum([atom.spin for atom in self.__atoms])
         else:
             self.__spin = spin
 
@@ -236,7 +235,7 @@ class Molecule(Chemical):
     def fixed(self, value):
         self.__fixed = value
     
-    def bonds(self, tolerance = 0.2):
+    def bonds(self, tolerance=0.2):
         '''
             Return a dataframe with bonds among atoms of a molecule object.
             Use distances up to (1+tolerance)*(R_i + R_j), with R_i the covalent radius of atom i.
@@ -248,14 +247,16 @@ class Molecule(Chemical):
         for index1, atom1 in df.iterrows():
             for index2, atom2 in df.iterrows():
                 d = np.linalg.norm(atom1[['x', 'y', 'z']] - atom2[['x', 'y', 'z']])
-                covalent_sum = covalent_radius[int(atom1['element'])]+covalent_radius[int(atom2['element'])]
+                covalent_sum = covalent_radius[int(atom1['element'])]+ \
+                    covalent_radius[int(atom2['element'])]
                 if (d < covalent_sum*(1+tolerance)) and (d > 0.0) and (index2 > index1):
                     bonds_topology.append([index1,
                                            index2,
                                            df['label'].iloc[index1],
                                            df['label'].iloc[index2],
                                            d])
-                    directions.append((np.array(atom1[['x', 'y', 'z']], dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
+                    directions.append((np.array(atom1[['x', 'y', 'z']], \
+                        dtype=np.float32)-np.array(atom2[['x', 'y', 'z']], dtype=np.float32))/d)
         
         bonds_df = pd.DataFrame(bonds_topology, columns = ['index 1',
                                                            'index 2',
@@ -267,7 +268,7 @@ class Molecule(Chemical):
         bonds_df = bonds_df.reset_index().drop(['index'], axis = 1)
         return bonds_df
 
-    def nearest_neighbors_list(self, bonds = None):
+    def nearest_neighbors_list(self, bonds=None):
         '''
             From each atom in the molecule object, return a list with nearest neighbors (atom) indeces.
         '''
@@ -289,10 +290,11 @@ class Molecule(Chemical):
             nn_list.append(nn_atom)
         return nn_list
 
-    def nearest_neighbors_matrix(self, bonds = None):
+    def nearest_neighbors_matrix(self, bonds=None):
         '''
             Return a N*N matrix (dataframe) with N = number of atoms.
-            The matrix element [i][j] is the bond distance if i and j are nearest neighbors, and 0 otherwise.
+            The matrix element [i][j] is the bond distance if i and j are nearest neighbors,
+            and 0 otherwise.
         '''
         if bonds:
             bonds_df = bonds
@@ -306,11 +308,11 @@ class Molecule(Chemical):
 
         return pd.DataFrame(nn_matrix)
     
-    def angles(self, tolerance = 0.2):
+    def angles(self, tolerance=0.2):
         '''
             Return a dataframe of angles of a molecule object.
         '''
-        bonds_df = self.bonds(tolerance = tolerance)
+        bonds_df = self.bonds(tolerance=tolerance)
         df = self.to_dataframe()
 
         number_of_atoms = df.shape[0]
@@ -356,7 +358,7 @@ class Molecule(Chemical):
                                                     'normal'])
         return angles_df
 
-    def dihedral_angles(self, tolerance = 0.2):
+    def dihedral_angles(self, tolerance=0.2):
         '''
             Return a dataframe of dihedral (proper) angles of a molecule object.
         '''
@@ -368,7 +370,7 @@ class Molecule(Chemical):
 
         # TODO
 
-    def improper_angles(self, tolerance = 0.2):
+    def improper_angles(self, tolerance=0.2):
         '''
             Return a data frame of improper torsion angles for a molecule object.
         '''
@@ -413,7 +415,7 @@ class Molecule(Chemical):
         coordinate_x = []
         coordinate_y = []
         coordinate_z = []
-        with open(filename, 'r', encoding="utf-8") as stream:
+        with open(filename, 'r', encoding = "utf-8") as stream:
             number_of_atoms = int(stream.readline())
             comment = stream.readline()
             for index in range(number_of_atoms):
@@ -457,7 +459,7 @@ class Material(Chemical):
     '''
         Materials are defined by a list of atoms (object) and Bravais lattice vectors. 
     '''
-    def __init__(self, atoms, lattice_constant = 1.0, bravais_vector = np.eye(3), crystallographic = True):
+    def __init__(self, atoms, lattice_constant=1.0, bravais_vector=np.eye(3), crystallographic=True):
         '''
             Material object constructor.
         '''
@@ -592,7 +594,7 @@ if __name__ == '__main__':
     # graphene.write_poscar()
     # print(graphene.to_dataframe())
 
-    filename = sys.argv[1]
+    filename = argv[1]
     molecule = Molecule()
     molecule.from_xyz(filename)
     # print(molecule.min_coordinates())

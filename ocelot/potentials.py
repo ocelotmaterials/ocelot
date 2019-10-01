@@ -22,30 +22,39 @@
 '''
 
 class Potential(object):
-  '''
-  Potencial define a potential energy among atoms.
-  '''
+    '''
+    Potencial define a potential energy among atoms.
+    '''
 
-  def __init__(self, mesh):
-    pass
+    def __init__(self, mesh):
+        pass
 
-  def lennard_jones(self):
-    pass
+    def lennard_jones(self):
+        pass
 
-  def stillinger_weber(self):
-    pass
+    def reduced_lennard_jones(self):
+        '''
+            Truncated and shifted form of Lennard-Jones potential, with r_c = 2.5 * \sigma (default).
+        '''
+        pass
 
-  def coulomb(self):
-    pass
+    def stillinger_weber(self):
+        pass
 
-  def harmonic_bonds(self):
-    pass
+    def coulomb(self):
+        pass
 
-  def harmonic_angles(self):
-    pass
+    def morse(self):
+        pass
 
-  def harmonic_dihedral(self):
-    pass
+    def harmonic_bonds(self):
+        pass
 
-  def harmonic_improper(self):
-    pass
+    def harmonic_angles(self):
+        pass
+
+    def harmonic_dihedral(self):
+        pass
+
+    def harmonic_improper(self):
+        pass

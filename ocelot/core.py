@@ -595,7 +595,8 @@ if __name__ == '__main__':
     filename = sys.argv[1]
     molecule = Molecule()
     molecule.from_xyz(filename)
-    # molecule.write_xyz()
+    # molecule2= molecule.move([-1.41178331, 1.06440733, 0.0])
+    # molecule2.write_xyz()
     # print("Molecule center:")
     # print(molecule.get_center())
     print("Molecule dataframe:")

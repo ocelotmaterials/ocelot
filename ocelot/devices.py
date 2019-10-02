@@ -23,6 +23,7 @@
 
 from abc import ABCMeta, abstractmethod
 
+
 class Device(object):
   __metaclass__ = ABCMeta
   def __init__(self):
@@ -31,7 +32,7 @@ class Device(object):
 
 class Qiskit(Device):
   def __init__(self):
-    # import qiskit as qk
+    from qiskit import IBMQ
     pass
 
 
@@ -53,7 +54,20 @@ class Cirq(Device):
     pass
 
 
-class Simulator(Device):
+class IBMQSimulator(Device):
+  '''
+  Simulator from IBMQ.
+  '''
+  from qiskit import Aer
+
+  def __init__(self):
+    pass
+
+class AnnealerSimulator(Device):
+  '''
+  Annealer simulator from D-Wave systems.
+  '''
+  import dimod
   def __init__(self):
     pass
 

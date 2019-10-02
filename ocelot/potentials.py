@@ -21,7 +21,9 @@
   Module for bonded and nonbonded potential energies for interactions between atoms.
 '''
 
-class Potential(object):
+from .core import Atom, Chemical, Molecule, Material
+
+class Potential(Molecule):
     '''
     Potencial define a potential energy among atoms.
     '''
@@ -72,13 +74,25 @@ class Potential(object):
         pass
 
     def harmonic_bonds(self):
-        pass
+        if self.fixed:
+            pass  # do nothing if molecule is fixed
+        else:
+            pass  # TODO
 
     def harmonic_angles(self):
-        pass
+        if self.fixed:
+            pass  # do nothing if molecule is fixed
+        else:
+            pass  # TODO
 
     def harmonic_dihedral(self):
-        pass
+        if self.fixed:
+            pass  # do nothing if molecule is fixed
+        else:
+            pass  # TODO
 
     def harmonic_improper(self):
-        pass
+        if self.fixed:
+            pass  # do nothing if molecule if fixed
+        else:
+            pass  # TODO

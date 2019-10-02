@@ -30,11 +30,27 @@ class Potential(object):
         pass
 
     def lennard_jones(self):
+        '''
+        Lennard-Jones potential for non-bonding interactions
+
+        V(r; epsilon, sigma) = 4\epsilon ((\sigma/r)**12 - (\sigma/r)**6)
+        '''
         pass
 
     def reduced_lennard_jones(self):
         '''
-            Truncated and shifted form of Lennard-Jones potential, with r_c = 2.5 * \sigma (default).
+        Truncated and shifted form of Lennard-Jones potential for non-bonding interactions, with r_c = 2.5 * \sigma (default).
+        for r > 2.5 * \sigma:
+            V(r) = 0
+        else:
+            V(r; epsilon, sigma) = 4\epsilon ((\sigma/r)**12 - (\sigma/r)**6) + constant
+        '''
+        pass
+
+    def buckingham(self):
+        '''
+        Buckingham potential
+            V(r; A, B, C) = A*exp(-B*r) - C/r**6
         '''
         pass
 
@@ -42,9 +58,17 @@ class Potential(object):
         pass
 
     def coulomb(self):
+        '''
+        Coulomb potential between charged particles
+            V(r; q1, q2, epsilon) = 1/(4*pi*epsilon*\epsilon_0)*(q1*q2/r)
+        '''
         pass
 
     def morse(self):
+        '''
+        Morse potential
+            V(r; D_e, a; r_e) = D_e*(1-exp(-a(r-r_e)))**2
+        '''
         pass
 
     def harmonic_bonds(self):

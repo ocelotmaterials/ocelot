@@ -28,7 +28,7 @@ setup(
     version = "0.0.5",
     packages = find_packages(),
     author = "Leandro Seixas",
-    author_email = "leandro.seixas@mackenzie.br", 
+    author_email = "leandro.fisica@gmail.com", 
     url="https://ocelot-quantum.org",
     description = "(Under development). Ocelot is a framework for quantum simulation of materials in quantum computers.",
     long_description='''

@@ -45,7 +45,7 @@ class Atom(object):
         Aditional attributes of atom objects are charge (by default = 0), and spin (by default = 0).
 
     Example 2:
-        To initialize a chloride anion (charge = -1), at coordinates = (0.0, 0.0, 3.14), use:
+        To initialize a chloride anion (charge = -1.0), at coordinates = (0.0, 0.0, 3.14), use:
         chloride1 = Atom(element = 17, charge = -1.0, spin = 0.0, coordinates = [0.0, 0.0, 3.14])
     '''
     def __init__(self, element=0, charge=0.0, spin=0.0, coordinates=np.array([0.0, 0.0, 0.0])):

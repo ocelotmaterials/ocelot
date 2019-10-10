@@ -4,7 +4,7 @@ ocelot/__pycache__/
 *.py[cod]
 *$py.class
 .DS_Store
-.vscode/
+.vscode/settings.json
 
 # C extensions
 *.so

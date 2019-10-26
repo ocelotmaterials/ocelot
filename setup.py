@@ -24,16 +24,15 @@ requirements = open('requirements.txt').readlines()
 requirements = [r.strip() for r in requirements]
 
 setup(
-    name = "ocelot-quantum",
-    version = "0.0.5",
+    name = "ocelot-materials",
+    version = "0.0.1",
     packages = find_packages(),
     author = "Leandro Seixas",
     author_email = "leandro.fisica@gmail.com", 
     url="https://ocelot-quantum.org",
-    description = "(Under development). Ocelot is a framework for quantum simulation of materials in quantum computers.",
+    description = "(Under development). Ocelot is a framework for materials simulations.",
     long_description='''
-    (Under development). Ocelot is a framework for quantum simulation of materials in quantum computers.
-    It is agnostic hardware, and can be used in annealer quantum computers and circuit model quantum computers. 
+    (Under development). Ocelot is a framework for materials simulations.
     ''',
     install_requires = requirements,
     license = 'Apache 2',

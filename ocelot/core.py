@@ -30,7 +30,7 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 import pandas as pd
 # import yaml
-from .constants import element_tuple, atomic_number, covalent_radius  # comment this line to test
+# from .constants import element, atomic_number, covalent_radius  # comment this line to test
 
 
 class Atom(object):
@@ -120,7 +120,7 @@ class Chemical(Atom):
 
         df = pd.DataFrame()
         df['element'] = element
-        df['label'] = [element_tuple[atom] for atom in element]
+        df['label'] = [element[atom] for atom in element]
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
@@ -454,7 +454,7 @@ class Molecule(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = [element_tuple[int(atom)] for atom in list(df['element'])]
+        label = [element[int(atom)] for atom in list(df['element'])]
 
         df['label'] = label
         df = df[['label', 'x', 'y', 'z']]
@@ -522,7 +522,7 @@ class Material(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = [element_tuple[atom] for atom in list(df['element'])]
+        label = [element[atom] for atom in list(df['element'])]
 
         df['label'] = label
         if self.crystallographic:
@@ -553,7 +553,7 @@ class Material(Chemical):
         unique_atoms = Counter(element)
         print("   ", end=" ")
         for unique_atom in unique_atoms:
-            print(element_tuple[unique_atom], end=" ")
+            print(element[unique_atom], end=" ")
 
         print("\n   ", end=" ")
         for unique_atom in unique_atoms:
@@ -580,7 +580,7 @@ class Material(Chemical):
 
 # testing module core
 if __name__ == '__main__':
-    from constants import element_tuple, atomic_number, covalent_radius
+    from constants import element, atomic_number, covalent_radius
     # atom1 = Atom(element = 6, charge =  1.00, coordinates = [0.86380, 1.07246, 1.16831])
     # atom2 = Atom(element = 1, charge = -0.25, coordinates = [0.76957, 0.07016, 1.64057])
     # atom3 = Atom(element = 1, charge = -0.25, coordinates = [1.93983, 1.32622, 1.04881])
@@ -612,8 +612,8 @@ if __name__ == '__main__':
     print("Molecule dataframe:")
     print(molecule.to_dataframe())
 
-    print("Molecule bonds:")
-    print(molecule.bonds())
+    # print("Molecule bonds:")
+    # print(molecule.bonds())
 
     # print("Molecule angles:")
     # print(molecule.angles())

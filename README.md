@@ -10,7 +10,7 @@
 
 The best way of installing ocelot is using pip:
 ```bash
-$ python -m pip install ocelot-quantum
+$ python -m pip install ocelot-materials
 ```
 
 For the latest cutting edge version, install with:

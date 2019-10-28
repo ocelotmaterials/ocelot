@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: algorithms.py
+# file: wavefunction.py
 
 # This code is part of Ocelot.
 #

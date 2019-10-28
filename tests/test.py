@@ -1,3 +1,3 @@
 import numpy as np
-#import ocelot.core as ocl
+#import ocelot as ocl
 

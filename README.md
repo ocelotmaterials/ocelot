@@ -1,4 +1,4 @@
-<p align="center"> <a href="https://ocelot-quantum.org/">
+<p align="center"> <a href="https://ocelotmaterials.com/">
 <img src="https://raw.githubusercontent.com/ocelotmaterials/ocelot/master/logo_horizontal.png" style="height: 90px">
 </a></p>
 

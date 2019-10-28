@@ -28,8 +28,8 @@ setup(
     version = "0.0.1",
     packages = find_packages(),
     author = "Leandro Seixas",
-    author_email = "leandro.fisica@gmail.com", 
-    url="https://ocelot-quantum.org",
+    author_email = "contact@ocelotmaterials.com", 
+    url="https://ocelotmaterials.com",
     description = "(Under development). Ocelot is a framework for materials simulations.",
     long_description='''
     (Under development). Ocelot is a framework for materials simulations.

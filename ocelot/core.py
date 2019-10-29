@@ -453,7 +453,7 @@ class Molecule(Chemical):
         '''
         df = self.to_dataframe()
         print(df.shape[0])
-        print("  ")   
+        print("  ")
         label = [element[int(atom)] for atom in list(df['element'])]
 
         df['label'] = label

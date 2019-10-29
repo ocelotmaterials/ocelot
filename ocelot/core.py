@@ -270,6 +270,7 @@ class Molecule(Chemical):
         bonds_df.sort_values('distance', inplace=True)
         bonds_df = bonds_df.reset_index().drop(['index'], axis=1)
         return bonds_df
+        # end of bonds() method
 
     def nearest_neighbors_list(self, bonds=None):
         '''
@@ -292,6 +293,7 @@ class Molecule(Chemical):
 
             nn_list.append(nn_atom)
         return nn_list
+        # end of nearest_neighbors_list() method
 
     def nearest_neighbors_matrix(self, bonds=None):
         '''
@@ -310,6 +312,7 @@ class Molecule(Chemical):
             nn_matrix[bond['index 1']][bond['index 2']] = bond['distance']
 
         return pd.DataFrame(nn_matrix)
+        # end of nearest_neighbors_matrix() method
 
     def angles(self, tolerance=0.2):
         '''
@@ -362,6 +365,7 @@ class Molecule(Chemical):
             'angle',
             'normal'])
         return angles_df
+        # end of angles() method
 
     def dihedral_angles(self, tolerance=0.2):
         '''

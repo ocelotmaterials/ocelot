@@ -50,8 +50,8 @@ graphene = ocl.Material(species = [carbon1, carbon2],
 
 A molecule object can also be created reading a *xyz* file with:
 ```python
-molecule = ocl.Molecule()         # creating a empty Molecule object
-molecule.from_xyz(./methane.xyz)  # reading xyz file
+molecule = ocl.Molecule()           # creating a empty Molecule object
+molecule.from_xyz("./methane.xyz")  # reading xyz file
 ```
 
 

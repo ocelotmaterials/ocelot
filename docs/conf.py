@@ -22,7 +22,7 @@ copyright = '2019, Leandro Seixas'
 author = 'Leandro Seixas'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.0.6'
 
 
 # -- General configuration ---------------------------------------------------

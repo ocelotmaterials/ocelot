@@ -30,7 +30,7 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 import pandas as pd
 # import yaml
-# from .constants import element, atomic_number, covalent_radius  # comment this line to test
+from .constants import element, atomic_number, covalent_radius  # comment this line to test
 
 
 class Atom(object):

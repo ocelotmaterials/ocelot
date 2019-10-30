@@ -29,8 +29,7 @@ from sys import argv
 from scipy.spatial.transform import Rotation
 import numpy as np
 import pandas as pd
-# import yaml
-from .constants import element, atomic_number, covalent_radius  # comment this line to test
+from .constants import element_list, atomic_number, covalent_radius  # comment this line to test
 
 
 class Atom(object):
@@ -111,7 +110,7 @@ class Chemical(Atom):
         '''
             Convert a list of atoms in a pandas dataframe.
         '''
-        element = [int(atom.element) for atom in self.atoms]
+        elements = [int(atom.element) for atom in self.atoms]
         coordinates = [atom.coordinates for atom in self.atoms]
 
         coordinate_x = np.array(coordinates)[:, 0]
@@ -119,8 +118,8 @@ class Chemical(Atom):
         coordinate_z = np.array(coordinates)[:, 2]
 
         df = pd.DataFrame()
-        df['element'] = element
-        df['label'] = [element[atom] for atom in element]
+        df['element'] = elements
+        df['label'] = [element_list[atom] for atom in elements]
         df['x'] = coordinate_x
         df['y'] = coordinate_y
         df['z'] = coordinate_z
@@ -458,7 +457,7 @@ class Molecule(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")
-        label = [element[int(atom)] for atom in list(df['element'])]
+        label = [element_list[int(atom)] for atom in list(df['element'])]
 
         df['label'] = label
         df = df[['label', 'x', 'y', 'z']]
@@ -526,7 +525,7 @@ class Material(Chemical):
         df = self.to_dataframe()
         print(df.shape[0])
         print("  ")   
-        label = [element[atom] for atom in list(df['element'])]
+        label = [element_list[atom] for atom in list(df['element'])]
 
         df['label'] = label
         if self.crystallographic:
@@ -557,7 +556,7 @@ class Material(Chemical):
         unique_atoms = Counter(element)
         print("   ", end=" ")
         for unique_atom in unique_atoms:
-            print(element[unique_atom], end=" ")
+            print(element_list[unique_atom], end=" ")
 
         print("\n   ", end=" ")
         for unique_atom in unique_atoms:
@@ -584,7 +583,7 @@ class Material(Chemical):
 
 # testing module core
 if __name__ == '__main__':
-    from constants import element, atomic_number, covalent_radius
+    from constants import element_list, atomic_number, covalent_radius
     # atom1 = Atom(element = 6, charge =  1.00, coordinates = [0.86380, 1.07246, 1.16831])
     # atom2 = Atom(element = 1, charge = -0.25, coordinates = [0.76957, 0.07016, 1.64057])
     # atom3 = Atom(element = 1, charge = -0.25, coordinates = [1.93983, 1.32622, 1.04881])
@@ -615,6 +614,7 @@ if __name__ == '__main__':
     # print(molecule.get_center())
     print("Molecule dataframe:")
     print(molecule.to_dataframe())
+    # molecule.write_xyz()
 
     # print("Molecule bonds:")
     # print(molecule.bonds())

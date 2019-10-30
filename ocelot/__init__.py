@@ -18,7 +18,8 @@
 #   limitations under the License.
 
 from .core import *
+from .constants import *
 #from .wavefunction import *
 #from .visualization import *
 
-__version__ = "0.0.1"
+__version__ = "0.0.6"

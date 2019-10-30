@@ -18,6 +18,7 @@
 #   limitations under the License.
 
 from setuptools import setup, find_packages
+# from .ocelot.__init__ import version
 
 # Read in requirements.txt
 requirements = open('requirements.txt').readlines()

@@ -1,5 +1,5 @@
 <p align="center"> <a href="https://ocelotmaterials.com/">
-<img src="https://raw.githubusercontent.com/ocelotmaterials/ocelot/master/logo_horizontal.png" style="height: 90px">
+<img src="https://raw.githubusercontent.com/ocelotmaterials/ocelot/master/logo_blue.png" style="height: 90px">
 </a></p>
 
 

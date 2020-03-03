@@ -26,7 +26,7 @@ requirements = [r.strip() for r in requirements]
 
 setup(
     name = "ocelot-quantum",
-    version = "0.0.1",
+    version = "0.0.7",
     packages = find_packages(),
     author = "Leandro Seixas",
     author_email = "contact@ocelotquantum.com", 

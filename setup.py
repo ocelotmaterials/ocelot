@@ -25,15 +25,15 @@ requirements = open('requirements.txt').readlines()
 requirements = [r.strip() for r in requirements]
 
 setup(
-    name = "ocelot-materials",
-    version = "0.0.6",
+    name = "ocelot-quantum",
+    version = "0.0.1",
     packages = find_packages(),
     author = "Leandro Seixas",
-    author_email = "contact@ocelotmaterials.com", 
-    url="https://ocelotmaterials.com",
-    description = "(Under development). Ocelot is a framework for materials simulations.",
+    author_email = "contact@ocelotquantum.com", 
+    url="https://ocelotquantum.com",
+    description = "(Under development). Ocelot is a framework for quantum simulations.",
     long_description='''
-    (Under development). Ocelot is a framework for materials simulations.
+    (Under development). Ocelot is a framework for quantum simulations.
     ''',
     install_requires = requirements,
     license = 'Apache 2',

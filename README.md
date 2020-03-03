@@ -1,5 +1,5 @@
-<p align="center"> <a href="https://ocelotmaterials.com/">
-<img src="https://raw.githubusercontent.com/ocelotmaterials/ocelot/master/logo_blue.png" style="height: 90px">
+<p align="center"> <a href="https://ocelotquantum.com/">
+<img src="https://raw.githubusercontent.com/ocelotquantum/ocelot/master/logo_quantum.png" style="height: 90px">
 </a></p>
 
 
@@ -11,12 +11,12 @@
 
 The best way of installing ocelot is using pip:
 ```bash
-$ python -m pip install ocelot-materials
+$ python -m pip install ocelot-quantum
 ```
 
 For the latest cutting edge version, install with:
 ```bash
-$ git clone https://github.com/ocelotmaterials/ocelot.git
+$ git clone https://github.com/ocelotquantum/ocelot.git
 $ cd ocelot
 $ python setup.py install
 ```
@@ -57,7 +57,7 @@ molecule.from_xyz("./methane.xyz")  # reading xyz file
 
 ## How to cite
 
-If you used ocelot materials in your paper, please cite: (to be published)
+If you used ocelot quantum in your paper, please cite: (to be published)
 
 
 ## Contributing

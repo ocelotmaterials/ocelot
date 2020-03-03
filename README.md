@@ -1,5 +1,5 @@
 <p align="center"> <a href="https://ocelotquantum.com/">
-<img src="https://raw.githubusercontent.com/ocelotquantum/ocelot/master/logo_quantum.png" style="height: 90px">
+<img src="https://raw.githubusercontent.com/ocelotquantum/ocelot/master/logo_ocelot.png" style="height: 90px">
 </a></p>
 
 

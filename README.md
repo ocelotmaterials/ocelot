@@ -3,7 +3,7 @@
 </a></p>
 
 
-[![PyPI - License](https://img.shields.io/pypi/l/ocelot-materials?color=green&style=for-the-badge)](LICENSE.txt)    [![PyPI](https://img.shields.io/pypi/v/ocelot-materials?color=red&label=version&style=for-the-badge)](https://pypi.org/project/ocelot-materials/)    [![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-materials?style=for-the-badge)](https://pypistats.org/packages/ocelot-materials)
+[![PyPI - License](https://img.shields.io/pypi/l/ocelot-quantum?color=green&style=for-the-badge)](LICENSE.txt)    [![PyPI](https://img.shields.io/pypi/v/ocelot-quantum?color=red&label=version&style=for-the-badge)](https://pypi.org/project/ocelot-quantum/)    [![PyPI - Downloads](https://img.shields.io/pypi/dm/ocelot-quantum?style=for-the-badge)](https://pypistats.org/packages/ocelot-quantum)
 
 (Under development). **Ocelot** is an open-source framework for materials simulations.
 

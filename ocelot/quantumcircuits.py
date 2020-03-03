@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# file: visualizations.py
+# file: quantumcircuits.py
 
 # This code is part of Ocelot.
 #
@@ -18,5 +18,6 @@
 #   limitations under the License.
 
 '''
-  Module visualizations
+Module quantumcircuits
 '''
+

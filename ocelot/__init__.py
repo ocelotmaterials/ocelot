@@ -3,7 +3,7 @@
 
 # This code is part of Ocelot.
 #
-# Copyright (c) 2019 Leandro Seixas Rocha.
+# Copyright (c) 2020 Leandro Seixas Rocha.
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,5 +21,7 @@ from .core import *
 from .constants import *
 #from .wavefunction import *
 #from .visualization import *
+#from .materuals import *
+#from .quantumcircuits import *
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
